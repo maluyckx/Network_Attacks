@@ -1,0 +1,500 @@
+curl -X GET 10.12.0.10
+ifconfig
+ping 10.12.0.10
+ufw
+firewall-cmd
+sudo ufw allow 80
+ifconfig
+curl 127.0.0.1
+netstat -na | grep :80
+nc -l -p 80
+ls
+curl 127.0.0.1
+netstat -lntu
+nc 10.12.0.10:80
+nc 10.12.0.10
+nc 10.12.0.10 80
+sudo apt install apache2
+ls
+pwd
+cd ../services/
+ls
+tar xjf httpd-2.4.57.tar.bz2 
+ls
+cd http
+cd httpd-2.4.57/
+ls
+./configure 
+curl 127.0.0.10
+sudo lsof -i:80
+netstat -na | grep :80
+ls
+wget https://dlcdn.apache.org/httpd/httpd-2.4.57.tar.bz2
+ls
+rm httpd-2.4.57.tar.bz2 
+cd project-network-attacks/
+ls
+mkdir services
+cd services/
+wget https://dlcdn.apache.org/httpd/httpd-2.4.57.tar.bz2
+bunzip2
+bunzip2 -d httpd-2.4.57.tar.bz2 
+ls
+rm httpd-2.4.57.tar 
+wget https://dlcdn.apache.org/httpd/httpd-2.4.57.tar.bz2
+tar xjvf httpd-2.4.57.tar.bz2 
+ls
+cd httpd-2.4.57/
+ls
+cd ..
+ls
+rm -rf httpd-2.4.57
+ls
+tar xjf httpd-2.4.57.tar.bz2 -C ./
+ls
+rm -rf httpd-2.4.57
+ls
+cd httpd-2.4.57/
+ls
+./config
+./configure 
+sudo ./configure
+ls
+ls
+cd project-network-attacks/
+ls
+cd topology/
+ls
+sudo -E python3 topo.py 
+ls
+cd /etc/
+ls
+cd apache2/
+ls
+nano apache2.conf 
+echo ${APACHE_RUN_DIR}
+cd ~
+ls
+cd /var/www/
+ls
+cd html/
+ls
+cat index.html 
+curl 127.0.0.1
+curl 127.0.0.1Â
+curl 127.0.01
+curl 127.0.0.1
+cd ~/project-network-attacks/topology/
+sudo python3 topo.py 
+sudo -E python3 topo.py 
+sudo apt purge apache2
+apache2
+sudo apt purge apache2
+apache2
+sudo -E python3 topo.py 
+ls
+sudo apt-get update
+ls
+sudo apt install apache2 
+sudo apt-get update
+sudo apt install apache2 
+sudo apt-get purge apache2
+sudo -E python3 ./project-network-attacks/topology/topo.py 
+ifconfig
+ping 10.12.0.10
+curl 10.12.0.10
+ping 10.12.0.10
+curl 127.0.0.1
+curl 127.0.1.1
+curl 10.12.0.10
+ifconfig
+/usr/sbin/apache2ctl -DFOREGROUND
+netstat -lntu
+netstat -lntu
+/usr/sbin/ntpd -n
+/usr/sbin/named -f
+netstat -lntu
+ifconfig
+named-checkconf /etc/named.conf
+netstat -lntu
+ftp localhost
+/usr/sbin/vsftpd 
+ifconfig
+curl 10.12.0.10
+ping 10.12.0.20
+dig
+dig @10.12.0.20 10.12.0.30
+ftp 10.12.0.40
+scapy
+cd project-network-attacks/topology/
+ntp
+sudo lsof -i:80
+sudo lsof -i -P -n | grep LISTEN
+sudo nano /etc/ntp.conf 
+sudo systemctl enable ntpd
+ntpd
+sudo ntpd
+sudo lsof -i -P -n | grep LISTEN
+sudo systemctl stop ntpd
+sudo ntpq -p
+netstat -lntu
+man ntpd
+sudo /etc/init.d/ntp stop
+sudo ntpd -n
+sudo /etc/init.d/ntp stop
+netstat -lntu
+sudo ntpd -n
+netstat -lntu
+cd /usr/sbin/
+ls
+bind9
+named
+man named
+netstat -lntu
+sudo /etc/init.d/named stop
+netstat -lntu
+dig 235.1.25.65
+dig -v
+sudo /etc/init.d/named stop
+sudo useradd -m ftp_user
+echo $USER
+sudo passwd ftp_user
+su ftp_user
+netstat -lntu
+sudo /etc/init.d/named stop
+netstat -lntu
+ls
+man vsftpd
+vsftpd -v
+sudo /etc/init.d/vsftpd stop
+/usr/sbin/vsftpd 
+cat /etc/vsftpd.conf 
+ls -l /etc/vsftpd.conf 
+sudo /usr/sbin/vsftpd 
+sudo nano /etc/vsftpd.conf 
+sudo /usr/sbin/vsftpd 
+sudo nano /etc/vsftpd.conf 
+sudo /usr/sbin/vsftpd 
+/usr/sbin/vsftpd 
+sudo /usr/sbin/vsftpd 
+telnet
+ls
+ntpd
+sudo /etc/init.d/ntp stop
+sudo /usr/sbin/ntpd -n
+netstat -lntu
+sudo /usr/sbin/ntpd -n
+sudo /etc/init.d/ntp stop
+sudo apt purge ntp
+sudo apt update
+sudo apt install openntpd
+ls
+ntpd -d
+sudo ntpd -d
+ls
+sudo /etc/init.d/ntp stop
+sudo /etc/init.d/ntpd stop
+sudo /etc/init.d/openntpd stop
+sudo /etc/init.d/xntpd s
+netstat -lntu
+sudo ntpd -d
+sudo /etc/init.d/openntpd start
+sudo ntpd -d
+netstat -lntu
+sudo ntpd -d
+sudo nano /etc/ntpd.conf
+sudo ntpd -n
+sudo nano /etc/ntpd.conf
+cd /etc/examples
+man openntpd
+openntpd -v
+sudo openntpd -v
+sudo openntpd --version
+sudo openntpd -d
+sudo nano /etc/ntpd.conf
+sudo ntpd -n
+sudo ntpctl -s status
+sudo ntpd -d
+sudo rc-service ntpd restart
+sudo /etc/init.d/ntpd stop
+sudo /etc/init.d/openntpd stop
+sudo /etc/init.d/openntpd start
+sudo ntpd -n
+sudo ntpd -d
+sudo rm /etc/ntpd.conf 
+sudo nano /etc/openntpd/ntpd.conf 
+sudo ntpd -n
+
+sudo nano /etc/openntpd/ntpd.conf 
+sudo /usr/sbin/ntpd -n
+sudo /usr/sbin/ntpd -d
+netstat -lntu
+sudo /usr/sbin/ntpd -d
+man named
+/usr/sbin/named -f
+sudo /etc/init.d/named stop
+/usr/sbin/named -f
+/usr/sbin/named -v
+/usr/sbin/named -fg
+sudo /usr/sbin/named -f
+sudo nano /etc/bind/named.conf
+sudo nano /etc/bind/named.conf.local 
+sudo rm bind9
+sudo apt purge bind9
+sudo apt install dnsmasq
+netstat -lntu
+sudo /etc/init.d/dnsmasq stop
+man dnsmasq
+dnsmasq -v
+dnsmasq -k
+sudo dnsmasq -k
+/usr/sbin/ntpd -d
+netstat -lstu
+netstat -lntu
+ifconfig
+ls
+cd project-network-attacks/topology/
+sudo -E python3 ./topo.py 
+curl 127.0.0.1
+sudo apt-get install apache2
+ls
+curl 127.0.0.1
+sudo -E python3 ./topo.py 
+sudo /etc/init.d/apache2 stop
+curl 127.0.0.1
+sudo -E python3 ./topo.py 
+curl 127.0.0.1
+sudo service apache2 stop
+curl 127.0.0.1
+sudo service apache2 start
+curl 127.0.0.1
+sudo service apache2 stop
+sudo  /etc/init.d/apache2 stop
+sudo  /etc/init.d/apache2 start
+curl 127.0.0.1
+sudo  /etc/init.d/apache2 stop
+curl 127.0.0.1
+sudo -E python3 ./topo.py 
+netstat -lntu
+sudo ntpctl -s
+sudo ntpctl -s status
+netstat -lntu
+scapy
+sudo scapy
+netstat -lntu
+sudo scapy
+sudo shutdown now
+/usr/sbin/dnsmasq -k
+netstat -lntu
+ifconfig
+killall dnsmasq
+dig @10.12.0.20 domain.oof
+xterm ntp
+netstat -lntu
+curl localhost
+dig @localhost -p 5353 example.com
+ftp localhost
+curl 10.12.0.10
+dig @10.12.0.20 -p 5353 example.com
+scapy
+ntp 10.12.0.40
+ftp 10.12.0.40
+ifconfig
+ifconfig 
+ifconfig
+ifconfig
+curl 10.12.0.10
+cd ../..
+ls
+cd -
+ls
+sudo nft -f firewall.nft 
+sudo nft list table ip test
+ifconfig
+sudo nft list table ip test
+sudo nft flush ruleset
+sudo nft -f firewall.nft 
+sudo nft list table ip test
+sudo nft flush ruleset
+netstat -lntu
+sudo /etc/init.d/apache2 stop
+sudo /etc/init.d/dnsmasq stop
+sudo /etc/init.d/vsftpd stop
+
+netstat -lntu
+killall dnsmasq
+sudo killall dnsmasq
+dig
+dig @127.0.0.1 127.0.0.1
+netstat -lntu
+sudo killall dnsmasq
+netstat -lntu
+dig @localhost localhost
+dig @localhost example.com
+dig @localhost a-very-long-domain-name.com
+dig @localhost a-very-long-domain-name.org
+sudo killall dnsmasq
+dig @localhost a-very-long-domain-name.org
+netstat -lntu
+dig @localhost a-very-long-domain-name.org
+dig @localhost example.com
+dig @localhost example.org
+dig @localhost a-very-long-domain-name.com
+sudo killall dnsmasq
+dig @localhost oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof
+sudo killall dnsmasq
+dig @localhost i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof
+sudo killall dnsmasq
+dig @localhost domain.oof
+sudo killall dnsmasq
+dig @localhost domain.oof
+dig @localhost:5353 example.com
+dig @localhost -p 5353 example.com
+sudo killall dnsmasq
+sudo killall dnsmasq apache2
+which nft
+sudo dnsmasq -k
+sudo ss -lp "sport = :domain"
+sudo systemctl stop systemd-resolve
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+sudo systemctl mask systemd-resolved
+sudo systemctl unmask systemd-resolved
+sudo systemctl enable systemd-resolved
+sudo systemctl start systemd-resolved
+sudo nano /etc/dnsmasq.conf 
+sudo dnsmasq -k
+sudo /etc/init.d/dnsmasq restart
+sudo systemctl status dnsmasq.service
+sudo /etc/init.d/dnsmasq stop
+sudo /etc/init.d/dnsmasq start
+sudo /etc/init.d/dnsmasq stop
+sudo fuser -k 53/udp
+top 
+top -b -n 1 | grep 1098
+sudo dnsmasq -k
+ls
+sudo dnsmasq -k
+sudo nano /etc/dnsmasq.conf 
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+sudo systemctl mask systemd-resolved
+sudo dnsmasq -k
+sudo nano /etc/hosts
+sudo dnsmasq -k
+sudo nano /etc/resolv.conf 
+sudo nano /etc/hosts
+sudo dnsmasq -k
+sudo nano /etc/hosts
+sudo dnsmasq -k
+sudo nano /etc/hosts
+sudo dnsmasq -k
+sudo nano /etc/hosts
+sudo dnsmasq -k
+cd project-network-attacks/topology/
+sudo -E python3 ./topo.py 
+nano topo.py 
+ls
+sudo -E python3 ./topo.py 
+git status
+cd ../services/
+ls
+cd ../topology/
+rm -rf ../services/
+sudo rm -rf ../services/
+git status
+git pull
+sudo systemctl unmask systemd-resolved
+sudo systemctl enable systemd-resolved
+sudo systemctl start systemd-resolved
+git pull
+sudo nano /etc/dnsmasq.conf 
+sudo dnsmasq -k
+ls
+cd ../..
+ls
+cd mininet/
+ls
+cd ..
+c nftables/
+ls
+cd nftables/
+ls
+cd h1/
+ls
+cat firewall.nft 
+cd ../..
+rm -rf nftables/
+ls
+cd oftest/
+ls
+cd ..
+sudo nano /etc/resolv
+sudo nano /etc/resolv.conf 
+ls
+cd project-network-attacks/topology/
+sudo -E python3 ./topo.py 
+sudo mn -c
+sudo -E python3 ./topo.py 
+/usr/sbin/apache2ctl -DFOREGROUND
+sudo /usr/sbin/apache2ctl -DFOREGROUND
+sudo /etc/init.d/apache2 stop
+sudo /etc/init.d/dnsmasq stop
+sudo /etc/init.d/vsftpd stop
+runlevel
+sudo runlevel
+sudo nano /etc/rc5.d/
+cd /etc/rc5.d/
+ls
+rm S01apache2 
+sudo rm S01apache2 
+sudo rm S01dnsmasq 
+sudo rm S01vsftpd 
+cd ..
+ls
+cd ~/project-network-attacks/topology/
+ls
+/usr/sbin/apache2ctl -DFOREGROUND
+sudo /usr/sbin/apache2ctl -DFOREGROUND
+sudo /etc/init.d/apache2 stop
+sudo /usr/sbin/apache2ctl -DFOREGROUND
+sudo /etc/init.d/apache2 stop
+kill 2847
+sudo kill 2847
+sudo /usr/sbin/apache2ctl -DFOREGROUND
+sudo killall apache2
+sudo -E python3 ./topo.py 
+sudo mn -c
+sudo killall apache2
+sudo -E python3 ./topo.py 
+sudo mn -c
+sudo /usr/sbin/apache2ctl -DFOREGROUND
+killall apache2 
+sudo killall apache2 
+sudo -E python3 ./topo.py 
+sudo shutdown now
+git status
+git commit -am "Added service stop to topology"
+git push
+curl localhost
+sudo killall apache2
+curl localhost
+sudo -E python3 ./project-network-attacks/topology/topo.py 
+sudo mn -c
+ls
+cd project-network-attacks/
+ls
+cd topology/
+ls
+cd ../..
+mkdir LINFO2347
+mv project-network-attacks/topology/topo.py ./LINFO2347/
+cd LINFO2347/
+ls
+sudo -E python3 ./topo.py 
+cd ..
+ls
+sudo rm -rf project-network-attacks/
+ls
+git pull
+sudo shutdown now
