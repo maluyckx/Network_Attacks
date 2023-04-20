@@ -60,8 +60,8 @@ topos = {
 
 def add_routes(net):
     ### STATIC ROUTES ###
-    info(net['r1'].cmd("ip route add 10.2.0.0/24 via 10.12.0.2 dev r1-eth12"))
-    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.12.0.1 dev r2-eth12"))
+    info(net['r1'].cmd("ip route add 10.2.0.0/24 via 10.12.0.2 dev r1-eth12")) # connect r1 to internet via r2
+    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.12.0.1 dev r2-eth12")) # connect r2 to internet via r1
 
 
 def start_services(net):

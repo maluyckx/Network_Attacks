@@ -13,6 +13,18 @@ DNS : dnsmasq
 NTP : OpenNTPD
 FTP : vsftpd
 
+
+## NFT rules table command
+
+```
+sudo nft list ruleset
+sudo nft flush ruleset
+sudo nft list ruleset
+
+
+
+```
+
 ## Useful links
 
 - https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
