@@ -21,7 +21,7 @@ sudo nft list ruleset
 sudo nft flush ruleset
 sudo nft list ruleset
 
-
+xterm ws2 ws3 s1 r1 s2 r2 internet http dns ntp ftp
 
 ```
 

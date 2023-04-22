@@ -1,0 +1,36 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+    chain incoming {
+        type filter hook input priority 0; policy drop;
+
+
+        # Allow established connections
+        ct state established,related accept
+        # Drop invalid connections
+        ct state invalid drop
+
+    }
+
+    chain forward {
+        type filter hook forward priority 0;  policy drop;
+
+        # Allow established connections
+        ct state established,related accept
+        # Drop invalid connections
+        ct state invalid drop
+
+    }
+
+    chain outgoing {
+        type filter hook output priority 0;  policy drop;
+
+        # Allow outgoing traffic
+        ct state new,established,related accept
+
+        # Any other host
+        #ip daddr { 10.1.0.2, 10.1.0.3, 10.1.0.0, 10.1.0.1, 10.12.0.1, 10.12.0.0, 10.12.0.10, 10.12.0.20, 10.12.0.30, 10.12.0.40, 10.12.0.2, 10.2.0.1, 10.2.0.0 }
+    }
+}
