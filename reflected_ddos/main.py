@@ -11,9 +11,5 @@ Reflected DDoS
 
 
 
-
-
-
-
 if __name__ == "__main__":
     print("yo")
