@@ -2,7 +2,7 @@
 Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
-Botnet
+SYN FLooding
 """
 
 
