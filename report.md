@@ -120,14 +120,14 @@ ws3 -> dns ftp http internet ntp r1 r2 ws2
 *** Results: 52% dropped (34/72 received) 
 ```
 
-To save time deploying all of our scripts at once, we created a simple Python script. To use it, simply run the command `source commands.py` in Mininet. Here's what the script looks like :
+To save time deploying all of our scripts at once, we created a simple Python script. To use it, simply run the command `source commands_basic_protection.py` in Mininet. Here's what the script looks like :
 ```bash
-py r1.cmd("sudo nft -f firewall_r1.nft")
-py r2.cmd("sudo nft -f firewall_r2.nft")
-py dns.cmd("sudo nft -f firewall_DMZ.nft")
-py http.cmd("sudo nft -f firewall_DMZ.nft")
-py ftp.cmd("sudo nft -f firewall_DMZ.nft")
-py ntp.cmd("sudo nft -f firewall_DMZ.nft")
+py r1.cmd("sudo nft -f protections/basic_network_protection/firewall_r1.nft")
+py r2.cmd("sudo nft -f protections/basic_network_protection/firewall_r2.nft")
+py dns.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
+py http.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
+py ftp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
+py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 ```
 
 ## How to launch attacks and protections
@@ -135,7 +135,7 @@ py ntp.cmd("sudo nft -f firewall_DMZ.nft")
 All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
 
 ## Network scans
-The attack script can be found in the `network_scans` folder. It performs a parallelized scan of every port from 1 to 65535.
+The attack script can be found in the `attacks/network_scans` folder. It performs a parallelized scan of every port from 1 to 65535.
 
 To launch the attack on `ws2` or `ws3`, follow these steps (TODO A AMELIORER):
 
@@ -159,7 +159,7 @@ TODO
 
 
 ## SSH/FTP brute-force attack
-The attack scripts can be found in the `ssh_ftp_brute_force` directory.
+The attack scripts can be found in the `attacks/ssh_ftp_brute_force` directory.
 
 Our script performs a threaded brute-force attack against an SSH/FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
 
@@ -189,28 +189,62 @@ TODO
 
 
 ## Reflected DDoS
+The attack scripts can be found in the `attacks/reflected_ddos` directory.
+
+
 
 ### Attack
 
 ### Protection
+
+TODO
 
 
 
 ## DNS/ARP cache poisoning
+The attack scripts can be found in the `attacks/dns_arp_cache_poisoning` directory.
 
-### Attack
 
-### Protection
+
+### Attack on ARP
+The `getmac()` function takes a `targetip` argument and creates an ARP request packet using the `Ether()` and `ARP()` functions with the destination MAC address set to the broadcast address (`ff:ff:ff:ff:ff:ff`) and the target IP address set to the `targetip` value. The `srp()` function is used to send the ARP request and wait for a response. If a response is received, the function returns the MAC address of the target IP address.
+
+The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `targetip` value, the source IP address set to the `sourceip` value, and the destination MAC address set to the `targetmac` value.
+
+
+### Protection on ARP
+
+TODO
+
+
+### Attack on ARP
+
+
+
+### Protection on ARP
+
+TODO
+
+
 
 
 
 ## SYN Flooding
+The attack scripts can be found in the `attacks/syn_flood_ddos` directory.
+
+We want to flood the target IP with a large number of packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
 
 ### Attack
 
+The script creates an IP packet using the `IP()` function with the destination IP address set to the `target_ip` value. The `TCP()` function is then used to create a TCP SYN packet with a random source port and the destination port set to the `target_port\ value. The `flags` parameter is set to "S" to indicate that this is a SYN packet.
+
+Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
+
+
 ### Protection
 
+TODO
 
 ## Authors (ULB matricule)
-LUYCKX Marco 496283
-BOUHNINE Ayoub 500048
+- LUYCKX Marco 496283
+- BOUHNINE Ayoub 500048

