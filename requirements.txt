@@ -1,0 +1,8 @@
+bcrypt==4.0.1
+cffi==1.15.1
+cryptography==40.0.2
+NetfilterQueue==1.1.0
+paramiko==3.1.0
+pycparser==2.21
+PyNaCl==1.5.0
+scapy==2.5.0

