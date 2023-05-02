@@ -133,10 +133,18 @@ py http.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 py ftp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 ```
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
+
 
 ## How to launch attacks and protections
 
 All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
+
+
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
 
 ## Network scans
 The attack script can be found in the `attacks/network_scans` folder. It performs a parallelized scan of every port from 1 to 65535.
@@ -174,7 +182,8 @@ TODO
 
 TODO
 
-
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
 
 ## SSH/FTP brute-force attack
 The attack scripts can be found in the `attacks/ssh_ftp_brute_force` directory.
@@ -223,6 +232,8 @@ TODO
 
 TODO
 
+[comment]: <> (###########################################)
+
 ### Attack on FTP
 
 We use the `ftplib` library to connect to the FTP server with the specified host IP address, username, and password. It reads in a wordlist file of commonly used passwords and attempts to log in with each password in the list using a separate thread for each login attempt.
@@ -260,7 +271,8 @@ TODO
 
 TODO
 
-
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
 
 ## Reflected DDoS
 The attack scripts can be found in the `attacks/reflected_ddos` directory.
@@ -287,8 +299,23 @@ TODO
 
 TODO
 
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
+
 
 ## DNS/ARP cache poisoning
+
+The attack script for ARP and DNS can be found respectively in the `attacks/dns_spoofing` folder and `attacks/dns_spoofing` folder. It intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. 
+
+Since, this type of attack requires to be between the victim and the DNS server, it will be required to launch the `ARP` poisoning first.
+
+To launch the attack against `ws3` from `ws2`, follow these steps:
+
+1) Open a new terminal window using the command `xterm ws2`.
+2) Move to the `attacks/dns_spoofing/` directory.
+3) Run the command `python3 main_arp.py` then run `python3 main_dns.py` (on another `xterm` terminal or in background)
+4) When the victime (`ws3`) .
+
 The attack scripts can be found in the `attacks/dns_arp_cache_poisoning` directory.
 
 To launch the attack on `DNS/ARP` from `ws2` (to target `ws3`), follow these steps :
@@ -299,7 +326,7 @@ To launch the attack on `DNS/ARP` from `ws2` (to target `ws3`), follow these ste
     For FTP : Run the command `python3 main_dns.py`.
 4) Enjoy.
 
-
+[comment]: <> (###########################################)
 
 ### Attack on ARP
 The `getmac()` function takes a `targetip` argument and creates an ARP request packet using the `Ether()` and `ARP()` functions with the destination MAC address set to the broadcast address (`ff:ff:ff:ff:ff:ff`) and the target IP address set to the `targetip` value. The `srp()` function is used to send the ARP request and wait for a response. If a response is received, the function returns the MAC address of the target IP address.
@@ -314,17 +341,60 @@ The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` argu
 
 ### Protection on ARP
 
-TODO
 
 ### Validation of the protection
 
 TODO
 
+[comment]: <> (###########################################)
+
 ### Attack on DNS
+
+The attack script can be found in the `attacks/dns_spoofing folder`. It intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. 
+
+Since, this type of attack requires to be between the victim and the DNS server, it will be required to launch the `ARP` poisoning first.
+
+To launch the attack against `ws3` from `ws2`, follow these steps:
+
+1) Open a new terminal window using the command `xterm ws2`.
+2) Move to the `attacks/dns_spoofing/` directory.
+3) Run the command `python3 main_arp.py` then run `python3 main_dns.py` (on another `xterm` terminal or in background)
+4) When the victime (`ws3`) .
+
+The attack script uses the Scapy library to intercept and modify DNS Resource Record packets. When a DNS response is detected, the script checks if the domain name in the response matches any of the predefined domain names in the dns_hosts dictionary. If a match is found, the script replaces the IP address in the DNS response with the fake IP address specified in the dictionary.
+
+The script uses the NetfilterQueue library to interface with the netfilter queue in the Linux kernel. This allows the script to intercept and modify packets as they pass through the kernel. The script adds an nftables rule to forward packets to the netfilter queue, enabling the script to process the packets.
+
+When the script is interrupted, it removes the nftables ruleset to return the system to its normal state.
+
 ### Validation of the attack
-```
+
+From `ws3`, open a `xterm` terminal, then type, for example, `dig @10.12.0.20 example.com -p 5353`
 
 ```
+; <<>> DiG 9.16.1-Ubuntu <<>> @10.12.0.20 example.com -p 5353
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 53412
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;example.com.			IN	A
+
+;; ANSWER SECTION:
+example.com.		0	IN	A	10.12.0.10
+
+;; Query time: 23 msec
+;; SERVER: 10.12.0.20#5353(10.12.0.20)
+;; WHEN: Tue May 02 15:07:30 PDT 2023
+;; MSG SIZE  rcvd: 67
+```
+
+Here we can directly see that the response from the DNS has been modified and therefore the address of `example.com` is no longer `192.192.192.192`. We choose in the script the address `10.12.0.10`, we can chose any address we want. 
+
 
 ### Protection on DNS
 
@@ -334,6 +404,9 @@ TODO
 
 TODO
 
+
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
 
 
 ## SYN Flooding
@@ -355,9 +428,21 @@ The script creates an IP packet using the `IP()` function with the destination I
 Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
 
 ### Validation of the attack
+
+<ins>Before SYN Flooding</ins>
+
+```
+real    0m0.023s
+user    0m0.000s
+sys     0m0.010s
+```
+
+<ins>After SYN Flooding</ins>
+
 ```
 
 ```
+
 
 ### Protection
 
@@ -368,7 +453,8 @@ TODO
 TODO
 
 
-
+[comment]: <> (###########################################)
+[comment]: <> (###########################################)
 
 
 ## Authors (ULB matricule)

@@ -1,3 +1,9 @@
+"""
+Luyckx Marco 496283
+Bouhnine Ayoub 500048
+
+SYN flood
+"""
 import subprocess
 import time
 import os

