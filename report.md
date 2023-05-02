@@ -4,6 +4,10 @@
 
 ![Topology](/img/topo.png)
 
+## Requirements for the project
+
+Before doing anything, you should do a `pip install -r requirements.txt`
+
 ## Firewall rules for basic enterprise network protection
 
 To make the topology more secure, we need to make changes : 
@@ -166,6 +170,9 @@ Time taken : 2.68119740486145
 
 TODO
 
+### Validation of the protection
+
+TODO
 
 
 
@@ -212,6 +219,10 @@ Time taken : 74.14346504211426
 
 TODO
 
+### Validation of the protection
+
+TODO
+
 ### Attack on FTP
 
 We use the `ftplib` library to connect to the FTP server with the specified host IP address, username, and password. It reads in a wordlist file of commonly used passwords and attempts to log in with each password in the list using a separate thread for each login attempt.
@@ -245,12 +256,21 @@ Time taken : 18.703977584838867
 TODO
 
 
+### Validation of the protection
+
+TODO
+
 
 
 ## Reflected DDoS
 The attack scripts can be found in the `attacks/reflected_ddos` directory.
 
+To launch the DDoS attack from `internet` (like a real attacker would do), follow these steps :
 
+1) Open a new terminal window using the command `xterm internet`.
+2) Move to the `attacks/reflected_ddos/` directory.
+3) Run the command `python3 main.py`.
+4) Enjoy.
 
 ### Attack
 
@@ -263,9 +283,21 @@ The attack scripts can be found in the `attacks/reflected_ddos` directory.
 TODO
 
 
+### Validation of the protection
+
+TODO
+
 
 ## DNS/ARP cache poisoning
 The attack scripts can be found in the `attacks/dns_arp_cache_poisoning` directory.
+
+To launch the attack on `DNS/ARP` from `ws2` (to target `ws3`), follow these steps :
+
+1) Open a new terminal window using the command `xterm ws2`.
+2) Move to the `attacks/ssh_ftp_brute_force/` directory.
+3) For SSH  : Run the command `python3 main_arp.py`. <br />
+    For FTP : Run the command `python3 main_dns.py`.
+4) Enjoy.
 
 
 
@@ -276,22 +308,31 @@ The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` argu
 
 
 ### Validation of the attack
+```
 
+```
 
 ### Protection on ARP
 
 TODO
 
+### Validation of the protection
 
-### Attack on ARP
+TODO
 
+### Attack on DNS
 ### Validation of the attack
+```
 
-### Protection on ARP
+```
+
+### Protection on DNS
 
 TODO
 
+### Validation of the protection
 
+TODO
 
 
 
@@ -300,6 +341,13 @@ The attack scripts can be found in the `attacks/syn_flood_ddos` directory.
 
 We want to flood the target IP with a large number of packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
 
+To launch the attack on `SSH/FTP` from `internet` (like a real attacker would do), follow these steps :
+
+1) Open a new terminal window using the command `xterm internet`.
+2) Move to the `attacks/syn_flood_ddos/` directory.
+3) Run the command `python3 syn_flood.py`.
+4) Enjoy.
+
 ### Attack
 
 The script creates an IP packet using the `IP()` function with the destination IP address set to the `target_ip` value. The `TCP()` function is then used to create a TCP SYN packet with a random source port and the destination port set to the `target_port\ value. The `flags` parameter is set to "S" to indicate that this is a SYN packet.
@@ -307,13 +355,17 @@ The script creates an IP packet using the `IP()` function with the destination I
 Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
 
 ### Validation of the attack
+```
 
+```
 
 ### Protection
 
 TODO
 
+### Validation of the protection
 
+TODO
 
 
 
