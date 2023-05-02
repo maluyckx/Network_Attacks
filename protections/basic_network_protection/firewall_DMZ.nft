@@ -15,7 +15,7 @@ table inet filter {
     chain output {
         type filter hook output priority 0; policy drop;
 
-        ip daddr {10.2.0.0/24, 10.1.0.0/24, 10.12.0.1, 10.12.0.2} ct state established,related accept # very strange (saddr or daddr)
+        ip daddr {10.2.0.0/24, 10.1.0.0/24, 10.12.0.1, 10.12.0.2} ct state established,related accept
 
     }
 }

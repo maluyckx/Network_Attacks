@@ -19,8 +19,6 @@ def portscan(port):
         except:
             pass
 
-
-
 if __name__ == "__main__":
     socket.setdefaulttimeout(0.25)
     print_lock = threading.Lock()
@@ -30,7 +28,7 @@ if __name__ == "__main__":
     print('Starting scan on host :', t_IP)
     with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         start_time = time.time()
-        ports = [port for port in range(1, 65557)]
+        ports = [port for port in range(1, 65535)]
         results = executor.map(portscan, ports)
 
     print('Time taken :', time.time() - start_time)
