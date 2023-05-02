@@ -137,12 +137,12 @@ All scripts are written in Python. To run them, simply use the command `python3 
 ## Network scans
 The attack script can be found in the `attacks/network_scans` folder. It performs a parallelized scan of every port from 1 to 65535.
 
-To launch the attack on `ws2` or `ws3`, follow these steps (TODO A AMELIORER):
+To launch the attack on `DMZ_servers` from `internet` (like a real attacker would do), follow these steps :
 
-1) Open a new terminal window using the command xterm X.
-2) Navigate to the network_scans folder.
-3) Run the command python3 main.py.
-4) When prompted with the IP address, enter the target IP address.
+1) Open a new terminal window using the command `xterm internet`.
+2) Move to the `attacks/network_scans/` directory.
+3) Run the command `python3 main.py`.
+4) Enjoy.
 
 ### Attack
 The attack script uses the socket library to create TCP sockets and attempt to connect to ports within the range of 1-65535. For each port, the script attempts to connect to the IP address and port combination using the `s.connect((t_IP, port))` statement. If a connection is successful, the script prints the port number and the protocol name associated with the port using the `socket.getservbyport(port)` function call.
@@ -150,6 +150,17 @@ The attack script uses the socket library to create TCP sockets and attempt to c
 To manage a thread pool of up to 100 worker threads, the script uses the `concurrent.futures.ThreadPoolExecutor` function. This allows multiple port scan requests to be processed concurrently.
 
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
+
+
+### Validation of the attack
+```
+Starting scan on host : 192.168.56.101
+21 is open. Possibly : ftp
+22 is open. Possibly : ssh
+80 is open. Possibly : http
+5353 is open. Possibly : mdns
+Time taken : 2.68119740486145
+```
 
 ### Protection
 
@@ -161,13 +172,41 @@ TODO
 ## SSH/FTP brute-force attack
 The attack scripts can be found in the `attacks/ssh_ftp_brute_force` directory.
 
-Our script performs a threaded brute-force attack against an SSH/FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
+Our scripts performs a threaded brute-force attack against an SSH/FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
+
+To launch the attack on `SSH/FTP` from `internet` (like a real attacker would do), follow these steps :
+
+1) Open a new terminal window using the command `xterm internet`.
+2) Move to the `attacks/ssh_ftp_brute_force/` directory.
+3) For SSH  : Run the command `python3 main_ssh.py`. <br />
+    For FTP : Run the command `python3 main_ftp.py`.
+4) Enjoy.
+
 
 ### Attack on SSH
 
 We use the `paramiko` library to connect to the SSH server with the specified host IP address, username, and password. It reads in `10k-most-common.txt` and attempts to log in with each password in the list, using a separate thread for each login attempt.
 
 The `multiprocessing.Pool` is used to manage a pool of worker processes, allowing multiple login attempts to be processed concurrently. For each password in the wordlist, the script submits a `ssh_connect` function call with the specified host IP address, username, and password to the pool using `pool.imap_unordered()`. The `imap_unordered` method returns an iterable that yields the result of each function call as soon as it becomes available, allowing the script to efficiently process the login attempts in parallel.
+
+### Validation of the attack
+```
+Starting threaded SSH bruteforce on 192.168.56.101 with account : mininet
+Incorrect Login : 123456
+Incorrect Login : password
+Incorrect Login : 1234
+.
+.
+.
+.
+Incorrect Login : iloveyou
+Incorrect Login : bailey
+Incorrect Login : jackson
+Incorrect Login : guitar
+Found Password : mininet for account : mininet
+Password Found : mininet
+Time taken : 74.14346504211426
+```
 
 ### Protection on SSH
 
@@ -180,6 +219,26 @@ We use the `ftplib` library to connect to the FTP server with the specified host
 The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 16 worker threads, allowing multiple login attempts to be processed concurrently.
 
 For each password in the wordlist, the script submits a `ftp_login` function call with the specified host IP address, username and password to the thread pool using `executor.submit()`. If the `ftp_login` function is successful in logging in, the password is printed to the console and the program exits.
+
+### Validation of the attack
+```
+Trying Login : calendar
+Trying Login : cheeky
+Trying Login : camel1
+.
+.
+.
+.
+Trying Login : hevnm4
+Trying Login : hugohugo
+Trying Login : eighty
+Trying Login : epson
+Trying Login : evangeli
+Trying Login : eeeee1
+Trying Login : eyphed
+Found Password : mininet for account : mininet
+Time taken : 18.703977584838867
+```
 
 ### Protection on FTP
 
@@ -194,6 +253,10 @@ The attack scripts can be found in the `attacks/reflected_ddos` directory.
 
 
 ### Attack
+
+
+### Validation of the attack
+
 
 ### Protection
 
@@ -212,6 +275,9 @@ The `getmac()` function takes a `targetip` argument and creates an ARP request p
 The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `targetip` value, the source IP address set to the `sourceip` value, and the destination MAC address set to the `targetmac` value.
 
 
+### Validation of the attack
+
+
 ### Protection on ARP
 
 TODO
@@ -219,7 +285,7 @@ TODO
 
 ### Attack on ARP
 
-
+### Validation of the attack
 
 ### Protection on ARP
 
@@ -240,10 +306,18 @@ The script creates an IP packet using the `IP()` function with the destination I
 
 Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
 
+### Validation of the attack
+
 
 ### Protection
 
 TODO
+
+
+
+
+
+
 
 ## Authors (ULB matricule)
 - LUYCKX Marco 496283

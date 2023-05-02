@@ -23,12 +23,13 @@ if __name__ == "__main__":
     socket.setdefaulttimeout(0.25)
     print_lock = threading.Lock()
 
-    target = "192.168.56.101"
-    t_IP = socket.gethostbyname(target)
-    print('Starting scan on host :', t_IP)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-        start_time = time.time()
-        ports = [port for port in range(1, 65535)]
-        results = executor.map(portscan, ports)
-
-    print('Time taken :', time.time() - start_time)
+    DMZ_server = ["10.12.0.10", "10.12.0.20", "10.12.0.30", "10.12.0.40"]
+    for host in DMZ_server:
+        t_IP = socket.gethostbyname(host)
+        print('Starting scan on host :', t_IP)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+            start_time = time.time()
+            ports = [port for port in range(1, 65535)]
+            results = executor.map(portscan, ports)
+            print(f'Time taken for {host}:', time.time() - start_time)
+    
