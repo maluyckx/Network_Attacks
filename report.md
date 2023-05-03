@@ -275,7 +275,7 @@ TODO
 [comment]: <> (###########################################)
 
 ## Reflected DDoS
-The attack scripts can be found in the `attacks/reflected_ddos` directory.
+The attack scripts can be found in the `attacks/reflected_ddos` directory. By default, the attack launchs from `internet` to `http`. It benefits from the return values of `dns` and `ntp` sent to `http` (using a spoofed source address) which usually are bigger than the requests. 
 
 To launch the DDoS attack from `internet` (like a real attacker would do), follow these steps :
 
@@ -286,6 +286,11 @@ To launch the DDoS attack from `internet` (like a real attacker would do), follo
 
 ### Attack
 
+We use the `scapy` library to craft DNS and NTP packets with the specified target IP address as the source IP, and send them to the DNS and NTP servers, respectively. The script performs a reflected DDoS attack by alternating between DNS and NTP requests which are submitted to separate threads for each attack attempt.
+
+The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 16 worker threads, allowing multiple DDoS attack attempts to be processed concurrently.
+
+For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address, DNS server or and NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result, and if it does not return a `None` value, the script shuts down the executor, prints the time taken, and exits.
 
 ### Validation of the attack
 
@@ -305,26 +310,14 @@ TODO
 
 ## DNS/ARP cache poisoning
 
-The attack script for ARP and DNS can be found respectively in the `attacks/dns_spoofing` folder and `attacks/dns_spoofing` folder. It intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. 
+The attack script for ARP and DNS can both be found in the `attacks/dns_arp_cache_poisoning` folder. The first script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer. The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.
 
-Since, this type of attack requires to be between the victim and the DNS server, it will be required to launch the `ARP` poisoning first.
-
-To launch the attack against `ws3` from `ws2`, follow these steps:
+To launch the `ARP`/`DNS` attack from `ws2` (to target `ws3`), follow these steps :
 
 1) Open a new terminal window using the command `xterm ws2`.
-2) Move to the `attacks/dns_spoofing/` directory.
-3) Run the command `python3 main_arp.py` then run `python3 main_dns.py` (on another `xterm` terminal or in background)
-4) When the victime (`ws3`) .
-
-The attack scripts can be found in the `attacks/dns_arp_cache_poisoning` directory.
-
-To launch the attack on `DNS/ARP` from `ws2` (to target `ws3`), follow these steps :
-
-1) Open a new terminal window using the command `xterm ws2`.
-2) Move to the `attacks/ssh_ftp_brute_force/` directory.
-3) For SSH  : Run the command `python3 main_arp.py`. <br />
-    For FTP : Run the command `python3 main_dns.py`.
-4) Enjoy.
+2) Move to the `attacks/dns_arp_cache_poisoning/` directory.
+3) Run the command `python3 main_arp.py`. For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background)
+4) When the victime (`ws3`) tries to perform requests, it will first goes through `ws2` before reaching its destination. For the DNS cache poisoning, the script will replace the domain names by fake IP addresses before sending them back to the victim 
 
 [comment]: <> (###########################################)
 
@@ -334,7 +327,16 @@ The `getmac()` function takes a `targetip` argument and creates an ARP request p
 The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `targetip` value, the source IP address set to the `sourceip` value, and the destination MAC address set to the `targetmac` value.
 
 
-### Validation of the attack
+### Attack on DNS
+
+The script sets up a netfilter queue by adding a ruleset using nftables, binds the queue number to the `process_packet()` callback, and starts the queue. If the script is interrupted with a keyboard interrupt, it flushes the rulesets and exits.
+
+The `process_packet()` is a callback function that is executed whenever a new packet is redirected to the netfilter queue. It first converts the netfilter queue packet to a Scapy packet. If the Scapy packet has a DNS Resource Record (DNS reply) layer, the function prints the packet summary before modification and attempts to modify the packet using the `modify_packet()` function. After modification, the packet summary is printed again, and the modified Scapy packet is set back as a netfilter queue packet. Finally, the packet is accepted.
+
+The `modify_packet()` function takes a `packet` argument containing a DNS Resource Record. It extracts the domain name and checks if it exists in the `dns_hosts` dictionary. If the domain name is not in the dictionary, the function prints "no modification" and returns the original packet. If the domain name is in the dictionary, the function crafts a new DNS answer with the spoofed IP address specified in the `dns_hosts` dictionary. It updates the DNS answer count to 1 and removes the checksums and length fields of the IP and UDP layers, allowing Scapy to recalculate them automatically. The modified packet is then returned.
+
+
+### Validation of the attack (ARP)
 ```
 
 ```
@@ -348,26 +350,7 @@ TODO
 
 [comment]: <> (###########################################)
 
-### Attack on DNS
-
-The attack script can be found in the `attacks/dns_spoofing folder`. It intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. 
-
-Since, this type of attack requires to be between the victim and the DNS server, it will be required to launch the `ARP` poisoning first.
-
-To launch the attack against `ws3` from `ws2`, follow these steps:
-
-1) Open a new terminal window using the command `xterm ws2`.
-2) Move to the `attacks/dns_spoofing/` directory.
-3) Run the command `python3 main_arp.py` then run `python3 main_dns.py` (on another `xterm` terminal or in background)
-4) When the victime (`ws3`) .
-
-The attack script uses the Scapy library to intercept and modify DNS Resource Record packets. When a DNS response is detected, the script checks if the domain name in the response matches any of the predefined domain names in the dns_hosts dictionary. If a match is found, the script replaces the IP address in the DNS response with the fake IP address specified in the dictionary.
-
-The script uses the NetfilterQueue library to interface with the netfilter queue in the Linux kernel. This allows the script to intercept and modify packets as they pass through the kernel. The script adds an nftables rule to forward packets to the netfilter queue, enabling the script to process the packets.
-
-When the script is interrupted, it removes the nftables ruleset to return the system to its normal state.
-
-### Validation of the attack
+### Validation of the attack (DNS)
 
 From `ws3`, open a `xterm` terminal, then type, for example, `dig @10.12.0.20 example.com -p 5353`
 
@@ -414,7 +397,7 @@ The attack scripts can be found in the `attacks/syn_flood_ddos` directory.
 
 We want to flood the target IP with a large number of packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
 
-To launch the attack on `SSH/FTP` from `internet` (like a real attacker would do), follow these steps :
+To launch the attack on `http` from `internet` (like a real attacker would do), follow these steps :
 
 1) Open a new terminal window using the command `xterm internet`.
 2) Move to the `attacks/syn_flood_ddos/` directory.
