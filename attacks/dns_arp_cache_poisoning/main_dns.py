@@ -24,7 +24,7 @@ def display_banner():
     """)
 
 dns_hosts = {
-    b"example.com.": "10.12.0.10", # redirect google to the internal http server
+    b"example.com.": "10.12.0.10",
     b"www.example.com.": "10.12.0.10",
     b"example.org" : "10.12.0.10",
     b"example.be" : "10.12.0.10",

@@ -294,6 +294,23 @@ For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` fu
 
 ### Validation of the attack
 
+In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server
+
+<ins>Before Reflected DDoS</ins>
+
+```
+real    0m0.017s
+user    0m0.001s
+sys     0m0.007s
+```
+
+<ins>After Reflected DDoS</ins>
+
+```
+real    0m0.574s
+user    0m0.000s
+sys     0m0.006s
+```
 
 ### Protection
 
@@ -401,7 +418,7 @@ To launch the attack on `http` from `internet` (like a real attacker would do), 
 
 1) Open a new terminal window using the command `xterm internet`.
 2) Move to the `attacks/syn_flood_ddos/` directory.
-3) Run the command `python3 syn_flood.py`.
+3) Run the command `python3 main.py`.
 4) Enjoy.
 
 ### Attack
@@ -411,6 +428,8 @@ The script creates an IP packet using the `IP()` function with the destination I
 Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
 
 ### Validation of the attack
+
+In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server
 
 <ins>Before SYN Flooding</ins>
 
@@ -423,7 +442,9 @@ sys     0m0.010s
 <ins>After SYN Flooding</ins>
 
 ```
-
+real    0m1.342s
+user    0m0.000s
+sys     0m0.020s
 ```
 
 
