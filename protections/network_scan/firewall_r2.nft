@@ -10,8 +10,6 @@ table inet filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
-        tcp dport 21 ct state new counter packets 1 bytes 60 jump block_ftp_bruteforce
-
         # Allow workstations to send a ping and initiate a connection towards any other hosts
         iif "r2-eth12" ip saddr 10.1.0.0/24 accept
 
@@ -33,10 +31,4 @@ table inet filter {
         type filter hook output priority 0; policy accept;
     }
 
-    chain block_ftp_bruteforce {
-        ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
-    }
-
 }
-
-#add rule inet filter input jump block_ftp_bruteforce

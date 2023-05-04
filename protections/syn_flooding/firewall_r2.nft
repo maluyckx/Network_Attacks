@@ -10,6 +10,9 @@ table inet filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
+        # SYN flood protection
+        tcp flags syn tcp flags == syn counter jump syn_flood_protection
+
         # Allow workstations to send a ping and initiate a connection towards any other hosts
         iif "r2-eth12" ip saddr 10.1.0.0/24 accept
 
@@ -26,8 +29,9 @@ table inet filter {
         iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state new,established,related accept
 
     }
-
-    chain output {
-        type filter hook output priority 0; policy accept;
+    
+    chain syn_flood_protection {
+        ct state new limit rate 3/second burst 5 packets counter accept
+        counter drop
     }
 }

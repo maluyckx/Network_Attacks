@@ -41,15 +41,15 @@ if __name__ == '__main__':
         with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
             futures = []
             for password in passwords:
-                print(password.strip())
+                print(f"Trying Login : {password.strip()}")
                 futures.append(executor.submit(
                     ftp_login, host, username, password.strip()))
 
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     executor.shutdown(wait=False)
-                    print('Time taken :', time.time() - start_time)
+                    
                     sys.exit(0)
 
     print('Password Not Found')
-    print('Time taken :', time.time() - start_time)
+    print(f"Time taken : {time.time() - start_time}")

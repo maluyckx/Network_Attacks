@@ -198,7 +198,7 @@ To launch the attack on `FTP` from `internet` (like a real attacker would do), f
 4) Enjoy.
 
 
-### Attack on FTP
+### Attack
 
 We use the `ftplib` library to connect to the FTP server with the specified host IP address, username, and password. It reads in a wordlist file of commonly used passwords and attempts to log in with each password in the list using a separate thread for each login attempt.
 
@@ -228,12 +228,43 @@ Time taken : 18.703977584838867
 
 ### Protection on FTP
 
-TODO
+To protect against FTP brute-force attacks, we need to keep track of the number of new, not-yet-established connection packets sent to the destination port `21` then if the rate of these packets exceeds a certain threshold, we drop the packets. // TODO
+
+To implement these changes, we added these rules to the `firewall_r2.nft` file.
+```
+...
+
+tcp dport 21 ct state new counter packets 1 bytes 60 jump block_ftp_bruteforce
+...
+
+chain block_ftp_bruteforce {
+    ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
+}
+
+```
 
 
 ### Validation of the protection
+As shown earlier, brute-forcing the password required approximately 18 seconds. Now, with the applied modifications : 
+```
+Trying Login : calendar
+Trying Login : cheeky
+Trying Login : camel1
+.
+.
+.
+.
+Trying Login : hugohugo
+Trying Login : eighty
+Trying Login : epson
+Trying Login : evangeli
+Trying Login : eeeee1
+Trying Login : eyphed
+Found Password : mininet for account : mininet
+Time taken : 372.4294068813324
 
-TODO
+```
+
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -428,20 +459,41 @@ sys     0m0.010s
 <ins>After SYN Flooding</ins>
 
 ```
-real    0m1.342s
+real    0m0.305s
 user    0m0.000s
-sys     0m0.020s
+sys     0m0.008s
 ```
 
 
 ### Protection
 
-TODO
+To implement these changes, we added these rules to the `firewall_r2.nft` file.
+
+The first rule filters incoming `TCP` packets with only the `SYN` flag set. The `SYN` flag is set in the initial packet of the `TCP` handshake process which is used to establish a connection between two hosts. The rule counts the number of packets that match these conditions using the `counter` keyword and, if a packet matches, it jumps to the `syn_flood_protection` chain for additional evaluation.
+
+A chain block is defined for processing the `SYN `packets that match the rule. The `ct state new` keyword is used to match packets that are part of a new connection. The `limit rate 3/second burst 5 packets` keywords are used to limit the number of packets that are accepted to 3 per second with a burst of 5 packets. This means that up to 5 packets can be processed in a short burst without triggering the rule. However, if the incoming packet rate consistently exceeds 3 packets per second, the rule will be triggered and the specified action will be taken. We estimate that a legitimate number of connections per second is 3 with temporary spikes of 5 connections. The `counter` keyword is used to count the number of packets that are accepted and dropped by the rule. If the number of packets exceeds the limit, the `drop` keyword is used to drop the packet. Otherwise, the `accept` keyword is used to accept the packet.
+
+Remark : When too many threads are launched, the VM is overloaded and the results are not necessarily reliable. In a real situation, the server would be more powerful and would be able to handle more requests.
+We can see that the time is not constant and that it is not necessarily longer than before the attack. 
+
+```
+# SYN flood protection
+tcp flags syn tcp flags == syn counter jump syn_flood_protection
+...
+chain syn_flood_protection {
+    ct state new limit rate 3/second burst 5 packets counter accept
+    counter drop
+}
+```
 
 ### Validation of the protection
 
-TODO
-
+After all the modifications with the modifications : 
+```
+real    0m0.089s
+user    0m0.006s
+sys     0m0.000s
+```
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
