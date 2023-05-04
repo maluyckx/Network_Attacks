@@ -124,7 +124,7 @@ ws3 -> dns ftp http internet ntp r1 r2 ws2
 *** Results: 52% dropped (34/72 received) 
 ```
 
-To save time deploying all of our scripts at once, we created a simple Python script. To use it, simply run the command `source commands_basic_protection.py` in Mininet. Here's what the script looks like :
+To save time deploying all of our scripts at once, we created a simple Python script. To use it, simply run the command `source protections/commands_basic_protection.py` in Mininet. Here's what the script looks like :
 ```bash
 py r1.cmd("sudo nft -f protections/basic_network_protection/firewall_r1.nft")
 py r2.cmd("sudo nft -f protections/basic_network_protection/firewall_r2.nft")

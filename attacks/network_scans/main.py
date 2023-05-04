@@ -31,6 +31,6 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
             start_time = time.time()
             ports = [port for port in range(1, 65535)]
-            results = executor.map(portscan, ports)
+            executor.map(portscan, ports)
             print(f'Time taken for {host}:', time.time() - start_time)
     

@@ -23,7 +23,7 @@ def ftp_login(host, username, password):
 
 
 if __name__ == '__main__':
-    host = "192.168.56.101"
+    host = "10.12.0.40"
     username = "mininet"
     wordlist = "10k-most-common.txt"
 
