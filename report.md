@@ -6,7 +6,7 @@
 
 ## Requirements for the project
 
-Before doing anything, you should do a `pip install -r requirements.txt`
+Before doing anything, you should do a `pip3 install -r requirements.txt`
 
 ## Firewall rules for basic enterprise network protection
 
@@ -354,7 +354,29 @@ The `modify_packet()` function takes a `packet` argument containing a DNS Resour
 
 
 ### Validation of the attack (ARP)
+
+For the validation, we launch the script then after, we can see the packets going through `ws2` using the command `tcpdump`. 
+
+Note that when running `tcpdump`, it will show a lot of `ARP` packets. These are the packets forged for cache poisoning. Therefore, we stopped the attack script after several seconds to easily find the packets going from `ws3` to the gateway through `ws2`.
+
+
+Result on the `ws3` when performing a ping to `http`
+
+```bash
+root@mininet-vm:~# ping 10.12.0.10
+PING 10.12.0.10 (10.12.0.10) 56(84) bytes of data.
+From 10.1.0.2: icmp_seq=1 Redirect Host(New nexthop: 10.1.0.1)
+64 bytes from 10.12.0.10: icmp_seq=1 ttl=61 time=2.36 ms
 ```
+
+Result on the `ws2` when using `tcpdump`
+
+```bash
+root@mininet-vm:~# tcpdump
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+09:52:46.513125 IP 10.1.0.3 > 10.12.0.10: ICMP echo request, id 2805, seq 11, length 64
+09:52:46.513179 IP 10.1.0.2 > 10.1.0.3: ICMP redirect 10.12.0.10 to host 10.1.0.1, length 92
 
 ```
 

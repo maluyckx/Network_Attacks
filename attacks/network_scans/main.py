@@ -19,6 +19,7 @@ def portscan(port):
         except:
             pass
 
+
 if __name__ == "__main__":
     socket.setdefaulttimeout(0.25)
     print_lock = threading.Lock()

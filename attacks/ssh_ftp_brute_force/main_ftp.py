@@ -5,8 +5,6 @@ Bouhnine Ayoub 500048
 Brute-forcing FTP
 """
 
-#!/usr/bin/env python3
-
 import sys
 import os
 import time
@@ -25,7 +23,6 @@ def ftp_login(host, username, password):
 
 
 if __name__ == '__main__':
-
     host = "192.168.56.101"
     username = "mininet"
     wordlist = "10k-most-common.txt"
