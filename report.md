@@ -185,54 +185,18 @@ TODO
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 
-## SSH/FTP brute-force attack
-The attack scripts can be found in the `attacks/ssh_ftp_brute_force` directory.
+## FTP brute-force attack
+The attack scripts can be found in the `attacks/ftp_brute_force` directory.
 
-Our scripts performs a threaded brute-force attack against an SSH/FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
+Our script performs a threaded brute-force attack against an FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
 
-To launch the attack on `SSH/FTP` from `internet` (like a real attacker would do), follow these steps :
+To launch the attack on `FTP` from `internet` (like a real attacker would do), follow these steps :
 
 1) Open a new terminal window using the command `xterm internet`.
-2) Move to the `attacks/ssh_ftp_brute_force/` directory.
-3) For SSH  : Run the command `python3 main_ssh.py`. <br />
-    For FTP : Run the command `python3 main_ftp.py`.
+2) Move to the `attacks/ftp_brute_force/` directory.
+3) Run the command `python3 main_ftp.py`.
 4) Enjoy.
 
-
-### Attack on SSH
-
-We use the `paramiko` library to connect to the SSH server with the specified host IP address, username, and password. It reads in `10k-most-common.txt` and attempts to log in with each password in the list, using a separate thread for each login attempt.
-
-The `multiprocessing.Pool` is used to manage a pool of worker processes, allowing multiple login attempts to be processed concurrently. For each password in the wordlist, the script submits a `ssh_connect` function call with the specified host IP address, username, and password to the pool using `pool.imap_unordered()`. The `imap_unordered` method returns an iterable that yields the result of each function call as soon as it becomes available, allowing the script to efficiently process the login attempts in parallel.
-
-### Validation of the attack
-```
-Starting threaded SSH bruteforce on 192.168.56.101 with account : mininet
-Incorrect Login : 123456
-Incorrect Login : password
-Incorrect Login : 1234
-.
-.
-.
-.
-Incorrect Login : iloveyou
-Incorrect Login : bailey
-Incorrect Login : jackson
-Incorrect Login : guitar
-Found Password : mininet for account : mininet
-Password Found : mininet
-Time taken : 74.14346504211426
-```
-
-### Protection on SSH
-
-TODO
-
-### Validation of the protection
-
-TODO
-
-[comment]: <> (###########################################)
 
 ### Attack on FTP
 

@@ -36,14 +36,14 @@ if __name__ == '__main__':
     start_time = time.time()
 
     with open(wordlist, 'r') as f:
-        words = f.readlines()
+        passwords = f.readlines()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
             futures = []
-            for word in words:
-                print(word)
+            for password in passwords:
+                print(password.strip())
                 futures.append(executor.submit(
-                    ftp_login, host, username, word.strip()))
+                    ftp_login, host, username, password.strip()))
 
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
