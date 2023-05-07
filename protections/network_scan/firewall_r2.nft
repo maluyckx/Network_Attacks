@@ -16,15 +16,24 @@ table inet filter {
         # Allow DMZ servers to only respond to incoming connections (from Internet)
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.2.0.0/24 ct state established,related accept
 
-        # #### Bypass Command ####
+        # #### Bypass Command #### # to redirect the packets to the other router (R1) because R2 is the default gateway for DMZ servers
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.1.0.0/24 accept
 
         # Allow Internet to only respond to incoming connections towards workstations
         iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.1.0.0/24 ct state established,related accept
 
         # Allow Internet to send ping and initiate a connection towards DMZ servers
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state new,established,related accept
+        # 10.12.0.10 accepts port 80
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.10 tcp dport 80 ct state new,established,related accept
 
+        # 10.12.0.20 accepts port 5353
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.20 udp dport 5353 ct state new,established,related accept
+
+        # 10.12.0.30 accepts port 123
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.30 udp dport 123 ct state new,established,related accept
+
+        # 10.12.0.40 accepts port 21
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.40 tcp dport 21 ct state new,established,related accept
     }
 
     chain output {

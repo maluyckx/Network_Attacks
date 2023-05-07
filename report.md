@@ -45,7 +45,7 @@ table inet filter {
 }
 ```
 
-The second one is one the router R2.
+The second one is one the router r2.
 ```
 #!/usr/sbin/nft -f
 
@@ -142,6 +142,9 @@ py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 
 All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
 
+General comment regarding our protections against reflected DDoS and syn flood attacks :  we conducted a test both before and after implementing the protection. We measured the time it took to curl a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the curl command was still longer than usual.
+
+Upon further investigation, we found that the cause of the delay was not due to our protection not working as intended, but rather the mininet topology being overloaded (dropping packets, etc). We confirmed this by using the tcpdump command on the correct interface to observe a reduction in the number of requests passing through.
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -228,15 +231,13 @@ Time taken : 18.703977584838867
 
 ### Protection on FTP
 
-To protect against FTP brute-force attacks, we need to keep track of the number of new, not-yet-established connection packets sent to the destination port `21` then if the rate of these packets exceeds a certain threshold, we drop the packets. // TODO
+To protect against `FTP` brute-force attacks, we need to keep track of the number of new, not-yet-established connection packets sent to the destination port `21` then if the rate of these packets exceeds a certain threshold, we drop them. // TODO
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
 ```
 ...
-
 tcp dport 21 ct state new counter packets 1 bytes 60 jump block_ftp_bruteforce
 ...
-
 chain block_ftp_bruteforce {
     ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
 }
@@ -309,12 +310,60 @@ sys     0m0.006s
 
 ### Protection
 
-TODO
+Initially, we attempted to implement `rate limiting` and `packet dropping` rules only on `r2`. But after a while, we thought that it was a better idea to solve this issue, by implementing some `load balancing`. We applied a rate limiter to the `r2` and closed all unnecessary ports in the architecture, while implementing packet dropping on the `DMZ-servers`.
 
+For `r2`, we added these rules to the `firewall_r2.nft` file. The values we used for the rate limiter are not typical real-world values, but they were chosen to validate the effectiveness of our protection and easily demonstrate it to you.
+
+```
+    iif "r2-eth0" ip protocol udp ip daddr { 10.12.0.20, 10.12.0.30 } jump protect_services
+    ...
+    chain protect_services {
+        udp dport 5353 limit rate 3/second burst 5 packets accept
+        udp dport 123 limit rate 3/second burst 5 packets accept
+    }
+}
+```
+The first rule is added to the chain `forward`.
+
+For `DMZ-servers`, we added these rules to the `firewall_DMZ.nft` file.
+
+```
+    ip daddr {10.2.0.0/24, 10.1.0.0/24, 10.12.0.1, 10.12.0.2} ct state established,related accept
+    ...
+    chain protect_services {
+        ip saddr != { 10.2.0.0/24 } drop
+    }
+}
+```
+The first rule is added to the chain `output`.
 
 ### Validation of the protection
 
-TODO
+As we said earlier, we are going to use `tcpdump` on the interface `r2-eth12` of `r2` to validate our protection : 
+
+```
+11:41:55.293670 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? test.com. (26)
+11:41:55.433769 IP 10.12.0.10.62249 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:55.627118 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? domain.oof. (28)
+11:41:55.665084 IP 10.12.0.10.37178 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:55.961650 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? example.be. (28)
+11:41:55.971535 IP 10.12.0.10.3024 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+
+11:41:56.293736 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? www.example.com. (33)
+11:41:56.429228 IP 10.12.0.10.46145 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:56.628870 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? example.com. (29)
+11:41:56.632363 IP 10.12.0.10.48964 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:56.960321 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? a-very-long-domain-name.com. (45)
+
+11:41:57.083972 IP 10.12.0.10.61670 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:57.293529 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? domain.oof. (28)
+11:41:57.386182 IP 10.12.0.10.8808 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:57.629414 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? a-very-long-domain-name.com. (45)
+11:41:57.687568 IP 10.12.0.10.12357 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+11:41:57.960520 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof. (80)
+```
+
+We can see that it validates our protection since, every seconds, only 3 packets of each types (DNS and NTP) are permitted to go through.
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -377,6 +426,7 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
+TODO
 
 ### Validation of the protection
 
