@@ -32,5 +32,4 @@ if __name__ == "__main__":
             start_time = time.time()
             ports = [port for port in range(1, 65535)]
             executor.map(portscan, ports)
-            print(f'Time taken for {host}:', time.time() - start_time)
-    
+        print(f'Time taken for {host}:', time.time() - start_time)

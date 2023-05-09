@@ -3,6 +3,13 @@
 flush ruleset
 
 table inet filter {
+
+    set blacklist {
+        type ipv4_addr
+        flags timeout
+        timeout 1h
+    }
+
     chain input {
         type filter hook input priority 0; policy accept;
     }
@@ -10,34 +17,33 @@ table inet filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
 
+        # Check if the source IP is in the blacklist and drop the packet if it is
+        ip saddr @blacklist drop
+
+        # Add the source IP to the blacklist if it exceeds the connection rate limit
+        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
+        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate 5/second accept
+
         # Allow workstations to send a ping and initiate a connection towards any other hosts
         iif "r2-eth12" ip saddr 10.1.0.0/24 accept
 
         # Allow DMZ servers to only respond to incoming connections (from Internet)
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.2.0.0/24 ct state established,related accept
 
-        # #### Bypass Command #### # to redirect the packets to the other router (R1) because R2 is the default gateway for DMZ servers
+        # #### Bypass Command ####
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.1.0.0/24 accept
 
         # Allow Internet to only respond to incoming connections towards workstations
         iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.1.0.0/24 ct state established,related accept
 
         # Allow Internet to send ping and initiate a connection towards DMZ servers
-        # 10.12.0.10 accepts port 80
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.10 tcp dport 80 ct state new,established,related accept
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state new,established,related accept
 
-        # 10.12.0.20 accepts port 5353
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.20 udp dport 5353 ct state new,established,related accept
 
-        # 10.12.0.30 accepts port 123
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.30 udp dport 123 ct state new,established,related accept
-
-        # 10.12.0.40 accepts port 21
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.40 tcp dport 21 ct state new,established,related accept
-    }
+   
+   }
 
     chain output {
         type filter hook output priority 0; policy accept;
     }
-
 }

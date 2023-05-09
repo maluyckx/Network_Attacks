@@ -6,7 +6,26 @@
 
 ## Requirements for the project
 
-Before doing anything, you should do a `pip3 install -r requirements.txt`
+Assuming that the `mininet-vm` is launched, first the files need to be copied inside the VM :
+
+`attacks` -> `/home/mininet/attacks`
+
+`protections` -> `/home/mininet/protections`
+
+`topo.py` -> `/home/mininet/LINFO2347/topo.py`
+
+`requirements.txt` -> `/home/mininet/requirements.txt`
+
+Then, use the command `pip3 install -r requirements.txt`
+
+
+## How to launch the topology
+
+You can launch the topology with the following command (after copying our files in the VM):
+
+To launch the mininet topology, execute this command in the VM at : `sudo -E python3 ~/LINFO2347/topo.py`
+
+For all other sections in this report, the default state will be inside the mininet environnement.
 
 ## Firewall rules for basic enterprise network protection
 
@@ -15,9 +34,9 @@ To make the topology more secure, we need to make changes :
 2) DMZ servers cannot send any ping or initiate any connection. They can only respond to  incoming connections.
 3) The Internet can send a ping or initiate a connection only towards DMZ servers. They cannot  send a ping or initiate connections towards workstations. 
  
-To implement these changes, we set up several nft tables.
+To implement these changes, we set up several nft tables that you can find in the folder `protections/basic_network/`.
 
-The first one is one the router R1.
+The first one is one the router r1.
 ```
 #!/usr/sbin/nft -f
 
@@ -65,15 +84,24 @@ table inet filter {
         # Allow DMZ servers to only respond to incoming connections (from Internet)
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.2.0.0/24 ct state established,related accept
 
-        # #### Bypass Command ####
+        # #### Bypass Command #### # to redirect the packets to the other router (R1) because R2 is the default gateway for DMZ servers
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.1.0.0/24 accept
 
         # Allow Internet to only respond to incoming connections towards workstations
         iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.1.0.0/24 ct state established,related accept
 
         # Allow Internet to send ping and initiate a connection towards DMZ servers
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state new,established,related accept
+        # 10.12.0.10 accepts port 80
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.10 tcp dport 80 ct state new,established,related accept
 
+        # 10.12.0.20 accepts port 5353
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.20 udp dport 5353 ct state new,established,related accept
+
+        # 10.12.0.30 accepts port 123
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.30 udp dport 123 ct state new,established,related accept
+
+        # 10.12.0.40 accepts port 21
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.40 tcp dport 21 ct state new,established,related accept
     }
 
     chain output {
@@ -124,7 +152,7 @@ ws3 -> dns ftp http internet ntp r1 r2 ws2
 *** Results: 52% dropped (34/72 received) 
 ```
 
-To save time deploying all of our scripts at once, we created a simple Python script. To use it, simply run the command `source protections/commands_basic_protection.py` in Mininet. Here's what the script looks like :
+To save time deploying all of our scripts at once, we created a simple python script. To use it, simply run the command `source protections/commands_basic_protection.py` in Mininet. Here's what the script looks like :
 ```bash
 py r1.cmd("sudo nft -f protections/basic_network_protection/firewall_r1.nft")
 py r2.cmd("sudo nft -f protections/basic_network_protection/firewall_r2.nft")
@@ -142,9 +170,9 @@ py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 
 All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
 
-General comment regarding our protections against reflected DDoS and syn flood attacks :  we conducted a test both before and after implementing the protection. We measured the time it took to curl a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the curl command was still longer than usual.
+General comment regarding our protections against reflected DDoS and syn flood attacks :  we conducted a test both before and after implementing the protection. We measured the time it took to `curl` a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the `curl` command was still longer than usual.
 
-Upon further investigation, we found that the cause of the delay was not due to our protection not working as intended, but rather the mininet topology being overloaded (dropping packets, etc). We confirmed this by using the tcpdump command on the correct interface to observe a reduction in the number of requests passing through.
+Upon further investigation, we found that the cause of the delay was not due to our protection not working as intended, but rather the mininet topology being **overloaded** (dropping packets, etc). We confirmed this by using the `tcpdump` command on the correct interface to observe a reduction in the number of requests passing through.
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -179,11 +207,19 @@ Time taken : 2.68119740486145
 
 ### Protection
 
-TODO
+```
+
+```
 
 ### Validation of the protection
 
-TODO
+After putting some protection in place and re-running the script, the attacker was not able to get a single port : 
+```
+
+
+```
+
+
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
