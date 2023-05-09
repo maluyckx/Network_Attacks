@@ -39,4 +39,5 @@ table inet filter {
     chain output {
         type filter hook output priority 0; policy accept;
     }
+
 }
