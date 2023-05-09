@@ -6,7 +6,7 @@
 
 ## Requirements for the project
 
-Assuming that the `mininet-vm` is launched, first the files need to be copied inside the VM :
+Assuming the `mininet-vm` is already launched, the following files need to be copied inside the VM before proceeding with the project :
 
 `attacks` -> `/home/mininet/attacks`
 
@@ -16,14 +16,14 @@ Assuming that the `mininet-vm` is launched, first the files need to be copied in
 
 `requirements.txt` -> `/home/mininet/requirements.txt`
 
-Then, use the command `pip3 install -r requirements.txt`
+Once the files are copied, you need to use the command `pip3 install -r requirements.txt` to install the required dependencies.
 
 
 ## How to launch the topology
 
-You can launch the topology with the following command (after copying our files in the VM):
+You can launch the topology with the following command (after copying our files in the VM) :
 
-To launch the mininet topology, execute this command in the VM at : `sudo -E python3 ~/LINFO2347/topo.py`
+To launch the mininet topology, execute this command in the VM : `sudo -E python3 ~/LINFO2347/topo.py`
 
 For all other sections in this report, the default state will be inside the mininet environnement.
 
