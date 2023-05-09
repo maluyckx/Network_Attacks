@@ -195,7 +195,7 @@ To manage a thread pool of up to 100 worker threads, the script uses the `concur
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
 
 
-### Validation of the attack
+### Validation of the attack TODO REFAIRE 
 ```
 Starting scan on host : 192.168.56.101
 21 is open. Possibly : ftp
