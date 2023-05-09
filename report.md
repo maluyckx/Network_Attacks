@@ -206,9 +206,29 @@ Time taken : 2.68119740486145
 ```
 
 ### Protection
+To protect against TCP Network scan, we need to keep track of the number of syn packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the host concerned is blacklisted for 1 hour. // TODO
+
+To implement these changes, we added these rules to the `firewall_r2.nft` file.
 
 ```
+    set blacklist {
+        type ipv4_addr
+        flags timeout
+        timeout 1h
+    }
+    ...
+    chain forward {
+        type filter hook forward priority 0; policy drop;
 
+        # Check if the source IP is in the blacklist and drop the packet if it is
+        ip saddr @blacklist drop
+
+        # Add the source IP to the blacklist if it exceeds the connection rate limit
+        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
+        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate 5/second accept
+    ...
+    }
+}
 ```
 
 ### Validation of the protection
