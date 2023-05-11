@@ -373,7 +373,7 @@ We use the `scapy` library to craft DNS and NTP packets with the specified targe
 
 The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 16 worker threads, allowing multiple DDoS attack attempts to be processed concurrently.
 
-For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address, DNS server or and NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result, and if it does not return a `None` value, the script shuts down the executor, prints the time taken, and exits.
+For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address, DNS server or and NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result, and if it does not return a `None` value, the script shuts down the executor, prints the time taken and exits.
 
 ### Validation of the attack
 
