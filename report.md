@@ -22,6 +22,8 @@ TODO maybe modifier /etc/hosts ?
 
 TODO maybe mettre des couleurs dans le rapport
 
+TODO changer le `dns_arp` du rapport
+
 ## How to launch the topology
 
 You can launch the topology with the following command (after copying our files in the VM) :
@@ -510,15 +512,53 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
-```
+To be honest, implementing a good protection for this attack was really though. We considered several solutions including : 
+- Static table : This would be an ideal solution since we are in a private network where MAC and IP addresses are typically static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
+- Rate-limiting and timeouts : While this solution would not **completely prevent** an attack, it would provide an early warning that the host is under attack and allow us for a response.
 
+A key point that allowed us to implement our solution is that the attacker's script needs to get the MAC address of the target using the function `get_mac`. When doing this, it burns his only attempt to get the MAC address. However, we are aware that this solution does not prevent completely the attack because an attacker who knows our protection table could :
+- Use the `get_mac` function
+- wait for 1 minute
+- Proceed with ARP cache poisoning
+
+And he would successfully bypass the protection that we made
+
+Despite the limitations, this is the best solution that we could think of and that offers a reasonable level of protection.
+
+(TODO remove) protect against our particular attack since we need to `get_mac` that particular MAC address before 
+
+For this attack, we need to create a new file named `firewall_workstation.nft`.
+
+```
+table arp filter {
+    chain input {
+        type filter hook input priority filter; policy accept;
+        # Limit ARP requests per MAC address
+        arp operation request meter per-mac { ether saddr limit rate 1/minute burst 1 packets } counter accept
+
+        # Drop other ARP requests and log them
+        arp operation request counter drop
+        }
+}
 ```
 
 ### Validation of the protection
 
-```
+In our scenario, `ws2` attacks `ws3`.
 
-```
+After executing the attack, we can see that the ARP table of `ws3` has been modified and only the MAC address of `r1` has been added. Therefore, whenever the attacker tries to send ARP packets, it will be blocked for 1 minute.
+
+![ARP_cache_poisoning](/img/validation_arp/validation_arp_attack.png)
+
+When trying to ping `ws3` from `ws2` before the 1 minute timeout, we can see that the packets are dropped.
+
+![ARP_cache_poisoning](/img/validation_arp/validation_arp_ping.png)
+
+After 1 minute, `ws2` is able to ping `ws3` again (the MAC address of `ws2` will be added to the arp table of `ws3`).
+
+![ARP_cache_poisoning](/img/validation_arp/validation_arp_after_rate_limit.png)
+
+
 
 [comment]: <> (###########################################)
 

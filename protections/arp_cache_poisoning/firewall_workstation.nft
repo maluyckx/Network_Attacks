@@ -1,0 +1,14 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table arp filter {
+    chain input {
+        type filter hook input priority filter; policy accept;
+        # Limit ARP requests per MAC address
+        arp operation request meter per-mac { ether saddr limit rate 1/minute burst 1 packets } counter accept
+
+        # Drop other ARP requests and log them
+        arp operation request counter drop
+        }
+}
