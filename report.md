@@ -18,6 +18,9 @@ Assuming that the `mininet-vm` is launched, first the files need to be copied in
 
 Then, use the command `pip3 install -r requirements.txt`
 
+TODO maybe modifier /etc/hosts ?
+
+TODO maybe mettre des couleurs dans le rapport
 
 ## How to launch the topology
 
@@ -25,7 +28,7 @@ You can launch the topology with the following command (after copying our files 
 
 To launch the mininet topology, execute this command in the VM at : `sudo -E python3 ~/LINFO2347/topo.py`
 
-For all other sections in this report, the default state will be inside the mininet environnement.
+For all other sections in this report, the default state will be inside the mininet environnement. 
 
 ## Firewall rules for basic enterprise network protection
 
@@ -233,12 +236,40 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 
 ### Validation of the protection
 
-After putting some protection in place and re-running the script, the attacker was not able to get a single port : 
+After implementing the security measures, the attacker was not able to get a single port on the mininet topology since he was blacklisted instantly after scanning 50 ports. The command `nft list set inet filter blacklist` can be used to display the IP address, as shown in the following output : 
+```bash
+root@mininet-vm:~# nft list set inet filter blacklist
+table inet filter {
+        set blacklist {
+                type ipv4_addr
+                size 65535
+                flags dynamic,timeout
+                timeout 1h
+                elements = { 10.2.0.2 expires 59m52s636ms }
+        }
+}
 ```
 
-
+And also, the `tcpdump -i r2-eth12 && date` capture of the scanned machine indicates that no further packets were received after the 50 packets and the `date` command confirms that no manipulation occurred. The output of the command is shown below :
+```bash
+root@mininet-vm:~# tcpdump -i r2-eth12 && date
+.
+.
+.
+.
+08:42:43.549316 IP 10.12.0.10.echo > 10.2.0.2.51736: Flags [R.], seq 0, ack 2576174796, win 0, length 0
+08:42:43.549797 IP 10.12.0.10.8 > 10.2.0.2.44356: Flags [R.], seq 0, ack 264977070, win 0, length 0
+08:42:43.550304 IP 10.12.0.10.discard > 10.2.0.2.48632: Flags [R.], seq 0, ack 2658341580, win 0, length 0
+08:42:43.550446 IP 10.2.0.2.44386 > 10.12.0.10.12: Flags [S], seq 1660961166, win 42340, options [mss 1460,sackOK,TS val 3671439964 ecr 0,nop,wscale 9], length 0
+08:42:43.550596 IP 10.2.0.2.50108 > 10.12.0.10.systat: Flags [S], seq 2559427937, win 42340, options [mss 1460,sackOK,TS val 3671439964 ecr 0,nop,wscale 9], length 0
+08:42:43.551320 IP 10.12.0.10.12 > 10.2.0.2.44386: Flags [R.], seq 0, ack 1660961167, win 0, length 0
+08:42:43.551636 IP 10.12.0.10.systat > 10.2.0.2.50108: Flags [R.], seq 0, ack 2559427938, win 0, length 0
+^C
+22 packets captured
+22 packets received by filter
+0 packets dropped by kernel
+Thu May 11 08:43:21 PDT 2023
 ```
-
 
 
 [comment]: <> (###########################################)
@@ -482,11 +513,15 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
-TODO
+```
+
+```
 
 ### Validation of the protection
 
-TODO
+```
+
+```
 
 [comment]: <> (###########################################)
 
