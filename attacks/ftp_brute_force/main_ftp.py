@@ -19,7 +19,7 @@ def ftp_login(host, username, password):
             print(f"Found Password : {password} for account : {username}")
             return True
     except:
-        pass
+        return False
 
 
 if __name__ == '__main__':
@@ -48,7 +48,6 @@ if __name__ == '__main__':
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     executor.shutdown(wait=False)
-                    
                     sys.exit(0)
 
     print('Password Not Found')

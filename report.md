@@ -6,7 +6,7 @@
 
 ## Requirements for the project
 
-Assuming that the `mininet-vm` is launched, first the files need to be copied inside the VM :
+Assuming the `mininet-vm` is already launched, the following files need to be copied inside the VM before proceeding with the project :
 
 `attacks` -> `/home/mininet/attacks`
 
@@ -16,7 +16,7 @@ Assuming that the `mininet-vm` is launched, first the files need to be copied in
 
 `requirements.txt` -> `/home/mininet/requirements.txt`
 
-Then, use the command `pip3 install -r requirements.txt`
+Once the files are copied, you need to use the command `pip3 install -r requirements.txt` to install the required dependencies.
 
 TODO maybe modifier /etc/hosts ?
 
@@ -24,9 +24,9 @@ TODO maybe mettre des couleurs dans le rapport
 
 ## How to launch the topology
 
-You can launch the topology with the following command (after copying our files in the VM):
+You can launch the topology with the following command (after copying our files in the VM) :
 
-To launch the mininet topology, execute this command in the VM at : `sudo -E python3 ~/LINFO2347/topo.py`
+To launch the mininet topology, execute this command in the VM : `sudo -E python3 ~/LINFO2347/topo.py`
 
 For all other sections in this report, the default state will be inside the mininet environnement. 
 
@@ -198,7 +198,7 @@ To manage a thread pool of up to 100 worker threads, the script uses the `concur
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
 
 
-### Validation of the attack
+### Validation of the attack TODO REFAIRE 
 ```
 Starting scan on host : 192.168.56.101
 21 is open. Possibly : ftp
@@ -328,7 +328,6 @@ tcp dport 21 ct state new counter packets 1 bytes 60 jump block_ftp_bruteforce
 chain block_ftp_bruteforce {
     ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
 }
-
 ```
 
 
@@ -350,7 +349,6 @@ Trying Login : eeeee1
 Trying Login : eyphed
 Found Password : mininet for account : mininet
 Time taken : 372.4294068813324
-
 ```
 
 
@@ -493,7 +491,7 @@ Note that when running `tcpdump`, it will show a lot of `ARP` packets. These are
 
 Result on the `ws3` when performing a ping to `http`
 
-```bash
+```
 root@mininet-vm:~# ping 10.12.0.10
 PING 10.12.0.10 (10.12.0.10) 56(84) bytes of data.
 From 10.1.0.2: icmp_seq=1 Redirect Host(New nexthop: 10.1.0.1)
@@ -502,13 +500,12 @@ From 10.1.0.2: icmp_seq=1 Redirect Host(New nexthop: 10.1.0.1)
 
 Result on the `ws2` when using `tcpdump`
 
-```bash
+```
 root@mininet-vm:~# tcpdump
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
 listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 09:52:46.513125 IP 10.1.0.3 > 10.12.0.10: ICMP echo request, id 2805, seq 11, length 64
 09:52:46.513179 IP 10.1.0.2 > 10.1.0.3: ICMP redirect 10.12.0.10 to host 10.1.0.1, length 92
-
 ```
 
 ### Protection on ARP
@@ -525,6 +522,7 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 [comment]: <> (###########################################)
 
+<!---
 ### Validation of the attack (DNS)
 
 From `ws3`, open a `xterm` terminal, then type, for example, `dig @10.12.0.20 example.com -p 5353`
@@ -562,6 +560,7 @@ TODO
 
 TODO
 
+-->
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -612,13 +611,12 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 
 The first rule filters incoming `TCP` packets with only the `SYN` flag set. The `SYN` flag is set in the initial packet of the `TCP` handshake process which is used to establish a connection between two hosts. The rule counts the number of packets that match these conditions using the `counter` keyword and, if a packet matches, it jumps to the `syn_flood_protection` chain for additional evaluation.
 
-A chain block is defined for processing the `SYN `packets that match the rule. The `ct state new` keyword is used to match packets that are part of a new connection. The `limit rate 3/second burst 5 packets` keywords are used to limit the number of packets that are accepted to 3 per second with a burst of 5 packets. This means that up to 5 packets can be processed in a short burst without triggering the rule. However, if the incoming packet rate consistently exceeds 3 packets per second, the rule will be triggered and the specified action will be taken. We estimate that a legitimate number of connections per second is 3 with temporary spikes of 5 connections. The `counter` keyword is used to count the number of packets that are accepted and dropped by the rule. If the number of packets exceeds the limit, the `drop` keyword is used to drop the packet. Otherwise, the `accept` keyword is used to accept the packet.
+A chain block is defined for processing the `SYN` packets that match the rule. The `ct state new` keyword is used to match packets that are part of a new connection. The `limit rate 3/second burst 5 packets` keywords are used to limit the number of packets that are accepted to 3 per second with a burst of 5 packets. This means that up to 5 packets can be processed in a short burst without triggering the rule. However, if the incoming packet rate consistently exceeds 3 packets per second, the rule will be triggered and the specified action will be taken. We estimate that a legitimate number of connections per second is 3 with temporary spikes of 5 connections. The `counter` keyword is used to count the number of packets that are accepted and dropped by the rule. If the number of packets exceeds the limit, the `drop` keyword is used to drop the packet. Otherwise, the `accept` keyword is used to accept the packet.
 
 Remark : When too many threads are launched, the VM is overloaded and the results are not necessarily reliable. In a real situation, the server would be more powerful and would be able to handle more requests.
 We can see that the time is not constant and that it is not necessarily longer than before the attack. 
 
 ```
-# SYN flood protection
 tcp flags syn tcp flags == syn counter jump syn_flood_protection
 ...
 chain syn_flood_protection {
