@@ -456,16 +456,19 @@ We can see that it validates our protection since, every seconds, only 3 packets
 [comment]: <> (###########################################)
 
 
-## DNS/ARP cache poisoning
+## ARP cache poisoning
 
-The attack script for ARP and DNS can both be found in the `attacks/dns_arp_cache_poisoning` folder. The first script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer. The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.
+The attack script for ARP <!---and DNS--> can <!---both--> be found in the `attacks/arp_cache_poisoning` folder. The first script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer. <!--- The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.-->
 
-To launch the `ARP`/`DNS` attack from `ws2` (to target `ws3`), follow these steps :
+To launch the `ARP` attack from `ws2` (to target `ws3`), follow these steps :
 
 1) Open a new terminal window using the command `xterm ws2`.
-2) Move to the `attacks/dns_arp_cache_poisoning/` directory.
-3) Run the command `python3 main_arp.py`. For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background)
-4) When the victime (`ws3`) tries to perform requests, it will first goes through `ws2` before reaching its destination. For the DNS cache poisoning, the script will replace the domain names by fake IP addresses before sending them back to the victim 
+2) Move to the `attacks/arp_cache_poisoning/` directory.
+3) Run the command `python3 main_arp.py`. <!---For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background) -->
+4) Once the victim (`ws3`) attempts to make a request, the request will first go through `ws2` before reaching its final destination.
+5) ENjoy
+   
+<!--- For the DNS cache poisoning, the script will replace the domain names by fake IP addresses before sending them back to the victim -->
 
 [comment]: <> (###########################################)
 
@@ -474,7 +477,7 @@ The `getmac()` function takes a `targetip` argument and creates an ARP request p
 
 The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `targetip` value, the source IP address set to the `sourceip` value, and the destination MAC address set to the `targetmac` value.
 
-
+<!---
 ### Attack on DNS
 
 The script sets up a netfilter queue by adding a ruleset using nftables, binds the queue number to the `process_packet()` callback, and starts the queue. If the script is interrupted with a keyboard interrupt, it flushes the rulesets and exits.
@@ -482,7 +485,7 @@ The script sets up a netfilter queue by adding a ruleset using nftables, binds t
 The `process_packet()` is a callback function that is executed whenever a new packet is redirected to the netfilter queue. It first converts the netfilter queue packet to a Scapy packet. If the Scapy packet has a DNS Resource Record (DNS reply) layer, the function prints the packet summary before modification and attempts to modify the packet using the `modify_packet()` function. After modification, the packet summary is printed again, and the modified Scapy packet is set back as a netfilter queue packet. Finally, the packet is accepted.
 
 The `modify_packet()` function takes a `packet` argument containing a DNS Resource Record. It extracts the domain name and checks if it exists in the `dns_hosts` dictionary. If the domain name is not in the dictionary, the function prints "no modification" and returns the original packet. If the domain name is in the dictionary, the function crafts a new DNS answer with the spoofed IP address specified in the `dns_hosts` dictionary. It updates the DNS answer count to 1 and removes the checksums and length fields of the IP and UDP layers, allowing Scapy to recalculate them automatically. The modified packet is then returned.
-
+-->
 
 ### Validation of the attack (ARP)
 
@@ -491,7 +494,7 @@ For the validation, we launch the script then after, we can see the packets goin
 Note that when running `tcpdump`, it will show a lot of `ARP` packets. These are the packets forged for cache poisoning. Therefore, we stopped the attack script after several seconds to easily find the packets going from `ws3` to the gateway through `ws2`.
 
 
-Result on the `ws3` when performing a ping to `http`
+Result on the `ws3` when performing a ping to `http` :
 
 ```
 root@mininet-vm:~# ping 10.12.0.10
@@ -500,7 +503,7 @@ From 10.1.0.2: icmp_seq=1 Redirect Host(New nexthop: 10.1.0.1)
 64 bytes from 10.12.0.10: icmp_seq=1 ttl=61 time=2.36 ms
 ```
 
-Result on the `ws2` when using `tcpdump`
+Result on the `ws2` when using `tcpdump` :
 
 ```
 root@mininet-vm:~# tcpdump
@@ -521,13 +524,13 @@ A key point that allowed us to implement our solution is that the attacker's scr
 - wait for 1 minute
 - Proceed with ARP cache poisoning
 
-And he would successfully bypass the protection that we made
+And he would successfully bypass the protection that we made.
 
 Despite the limitations, this is the best solution that we could think of and that offers a reasonable level of protection.
 
-(TODO remove) protect against our particular attack since we need to `get_mac` that particular MAC address before 
+<!---(TODO remove) protect against our particular attack since we need to `get_mac` that particular MAC address before -->
 
-For this attack, we need to create a new file named `firewall_workstation.nft`.
+For this attack, we need to create a new file named `firewall_workstation.nft` that is put on ws2. TODO VERIFY
 
 ```
 table arp filter {
