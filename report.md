@@ -20,9 +20,6 @@ Once the files are copied, you need to use the command `pip3 install -r requirem
 
 TODO maybe modifier /etc/hosts ?
 
-TODO maybe mettre des couleurs dans le rapport
-
-TODO changer le `dns_arp` du rapport
 
 ## How to launch the topology
 

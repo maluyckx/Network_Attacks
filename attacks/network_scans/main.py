@@ -4,32 +4,71 @@ Bouhnine Ayoub 500048
 
 Network scans
 """
+
+
 import socket
-import time
-import concurrent.futures
 import threading
+from queue import Queue
+import struct
+import time
+from scapy.all import *
 
-def portscan(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+target_hosts = ["10.12.0.10","10.12.0.20","10.12.0.30","10.12.0.40"]
+port_range = (1, 65535)
+num_threads = 100
+ntp_port = 123
+
+NTP_PACKET = struct.pack("!12I", *(2 << 3, ) + (0,) * 11)
+
+def scan_host(host, port_queue):
+    """
+    Function to scan ports on a single host
+    """
+    while not port_queue.empty():
+        port = port_queue.get()
         try:
-            s.connect((t_IP, port))
-            protocol_name = socket.getservbyport(port)
-            with print_lock:
-                print(port, 'is open. Possibly :', protocol_name) # possibly prc c threadé donc ça peut mélanger les outputs
-        except:
-            pass
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            result = sock.connect_ex((host, port))
+            
+            if result == 0:
+                print(f"Host : {host}, Port : {port} is open")
 
+
+            # Check the NTP port and send an NTP request and checks if there is a response
+            # elif port == ntp_port: # TODO : revoir cette partie /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\
+            #     ntp_packet = IP(dst=host)/UDP(dport=123)/Raw(load='\x1b' + 47 * '\0')
+            #     ans, unans = sr(ntp_packet,timeout=2) # or add the parameter loop=1
+            #     # Check if there is a response
+            #     print("ans : ", ans)
+            #     print("unans : ", unans)
+            #     if ans:
+            #         print("There is a response!")
+            #     else:
+            #         print("No response.")
+
+            sock.close()
+        except Exception as e:
+            print(f"Error scanning host {host}, port {port} : {e}")
+
+def main():
+    for host in target_hosts:
+        print(f"Scanning host: {host}")
+        start_time = time.time()
+        port_queue = Queue()
+        for port in range(*port_range):
+            port_queue.put(port)
+
+        threads = []
+        for _ in range(num_threads):
+            t = threading.Thread(target=scan_host, args=(host, port_queue))
+            t.start()
+            threads.append(t)
+
+        # Wait for all the threads to complete before moving on to the next host
+        for t in threads:
+            t.join()
+        print(f"Time taken : {time.time() - start_time}")
 
 if __name__ == "__main__":
-    socket.setdefaulttimeout(0.25)
-    print_lock = threading.Lock()
-
-    DMZ_server = ["10.12.0.10", "10.12.0.20", "10.12.0.30", "10.12.0.40"]
-    for host in DMZ_server:
-        t_IP = socket.gethostbyname(host)
-        print('Starting scan on host :', t_IP)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
-            start_time = time.time()
-            ports = [port for port in range(1, 65535)]
-            executor.map(portscan, ports)
-        print(f'Time taken for {host}:', time.time() - start_time)
+    main()
