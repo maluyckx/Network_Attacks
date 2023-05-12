@@ -20,6 +20,8 @@ Once the files are copied, you need to use the command `pip3 install -r requirem
 
 TODO maybe modifier /etc/hosts ?
 
+TODO fix les derniers todo des codes
+
 
 ## How to launch the topology
 
@@ -233,6 +235,8 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 }
 ```
 
+To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+
 ### Validation of the protection
 
 After implementing the security measures, the attacker was not able to get a single port on the mininet topology since he was blacklisted instantly after scanning 50 ports. The command `nft list set inet filter blacklist` can be used to display the IP address, as shown in the following output : 
@@ -315,6 +319,8 @@ Found Password : mininet for account : mininet
 Time taken : 18.703977584838867
 ```
 
+To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+
 ### Protection on FTP
 
 To protect against `FTP` brute-force attacks, we need to keep track of the number of new, not-yet-established connection packets sent to the destination port `21` then if the rate of these packets exceeds a certain threshold, we drop them. // TODO
@@ -394,10 +400,10 @@ sys     0m0.006s
 
 ### Protection
 
-Initially, we attempted to implement `rate limiting` and `packet dropping` rules only on `r2`. But after a while, we thought that it was a better idea to solve this issue, by implementing some `load balancing`. We applied a rate limiter to the `r2` and closed all unnecessary ports in the architecture, while implementing packet dropping on the `DMZ-servers`.
+Initially, we attempted to implement `rate limiting` and `packet dropping` rules only on `r2`. But after a while, we thought that it was a better idea to solve this issue, by implementing some `load balancing`. We applied a rate limiter to the `r2`, while implementing packet dropping on the `DMZ-servers`.
 
-For `r2`, we added these rules to the `firewall_r2.nft` file. The values we used for the rate limiter are not typical real-world values, but they were chosen to validate the effectiveness of our protection and easily demonstrate it to you.
-
+For `r2`, we added the following rules to the `firewall_r2.nft` file. The values we used for the rate limiter are not typical real-world values, but they were chosen to validate the effectiveness of our protection and easily demonstrate it to you.
+The first rule is added to the chain `forward` :
 ```
     iif "r2-eth0" ip protocol udp ip daddr { 10.12.0.20, 10.12.0.30 } jump protect_services
     ...
@@ -407,10 +413,9 @@ For `r2`, we added these rules to the `firewall_r2.nft` file. The values we used
     }
 }
 ```
-The first rule is added to the chain `forward`.
 
-For `DMZ-servers`, we added these rules to the `firewall_DMZ.nft` file.
-
+For `DMZ-servers`, we added the following rules to the `firewall_DMZ.nft` file.
+The first rule is added to the chain `output` :
 ```
     ip daddr {10.2.0.0/24, 10.1.0.0/24, 10.12.0.1, 10.12.0.2} ct state established,related accept
     ...
@@ -419,7 +424,8 @@ For `DMZ-servers`, we added these rules to the `firewall_DMZ.nft` file.
     }
 }
 ```
-The first rule is added to the chain `output`.
+
+To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
 
 ### Validation of the protection
 
@@ -453,7 +459,7 @@ We can see that it validates our protection since, every seconds, only 3 packets
 [comment]: <> (###########################################)
 
 
-## ARP cache poisoning
+## BONUS : ARP cache poisoning
 
 The attack script for ARP <!---and DNS--> can <!---both--> be found in the `attacks/arp_cache_poisoning` folder. The first script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer. <!--- The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.-->
 
@@ -510,6 +516,7 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 09:52:46.513179 IP 10.1.0.2 > 10.1.0.3: ICMP redirect 10.12.0.10 to host 10.1.0.1, length 92
 ```
 
+
 ### Protection on ARP
 
 To be honest, implementing a good protection for this attack was really though. We considered several solutions including : 
@@ -525,7 +532,7 @@ And he would successfully bypass the protection that we made.
 
 Despite the limitations, this is the best solution that we could think of and that offers a reasonable level of protection.
 
-<!---(TODO remove) protect against our particular attack since we need to `get_mac` that particular MAC address before -->
+<!--- protect against our particular attack since we need to `get_mac` that particular MAC address before -->
 
 For this attack, we need to create a new file named `firewall_workstation.nft` that is put on ws2. TODO VERIFY
 
@@ -541,6 +548,20 @@ table arp filter {
         }
 }
 ```
+
+Remark : 
+
+
+When trying to use the command `pingall` to verify network connectivity, we found something interesting. The ping from `r1` to `ws3` was not working as intended : 
+
+```
+r1 -> dns ftp http X ntp r2 ws2 X 
+```
+
+The reason is that the router `r1` (which at first do not know what is the IP address of `ws3`) does **multiple** ARP requests, which results in `r1` being blacklisted.
+
+To ensure a successful ping, it is necessary to wait for **one minute** before attempting the ping.
+
 
 ### Validation of the protection
 
@@ -594,11 +615,8 @@ Here we can directly see that the response from the DNS has been modified and th
 
 ### Protection on DNS
 
-TODO
-
 ### Validation of the protection
 
-TODO
 
 -->
 
@@ -606,7 +624,7 @@ TODO
 [comment]: <> (###########################################)
 
 
-## SYN Flooding
+## BONUS : SYN Flooding
 The attack scripts can be found in the `attacks/syn_flood_ddos` directory.
 
 We want to flood the target IP with a large number of packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
@@ -664,6 +682,8 @@ chain syn_flood_protection {
     counter drop
 }
 ```
+
+To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
 
 ### Validation of the protection
 
