@@ -484,18 +484,16 @@ We can see that it validates our protection since, every seconds, only 3 packets
 
 ## BONUS : ARP cache poisoning
 
-The attack script for ARP <!---and DNS--> can <!---both--> be found in the `attacks/arp_cache_poisoning` folder. The <!---first--> script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer instead of the router. <!--- The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.-->
+The attack script for ARP can be found in the `attacks/arp_cache_poisoning` folder. The script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer instead of the router. 
 
 To launch the `ARP` attack from `ws2` (to target `ws3`), follow these steps :
 
 1) Open a new terminal window using the command `xterm ws2`.
 2) Move to the `attacks/arp_cache_poisoning/` directory.
-3) Run the command `python3 main.py`. <!---For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background) -->
+3) Run the command `python3 main.py`.
 4) Once the victim (`ws3`) attempts to make a request, the request will first go through `ws2` before reaching its final destination.
 5) Enjoy.
    
-<!--- For the DNS cache poisoning, the script will replace the domain names by fake IP addresses before sending them back to the victim -->
-
 [comment]: <> (###########################################)
 
 ### Attack on ARP
@@ -504,16 +502,6 @@ The `get_mac()` function takes a `target_ip` argument and creates an ARP request
 The `spoof_arp_cache()` function takes `target_ip`, `target_mac` and `source_ip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `target_ip` value, the source IP address set to the `source_ip` value and the destination MAC address set to the `target_mac` value.
 
 The `craft_packet_target_ip()` function takes `host_ip` and `target_ip` parameters and constructs a packet with a spoofed source IP address to transmit to the intended machine. The IP function is used to set the destination IP address to `host_ip` and the source IP address to `target_ip`. The TCP function is used to create a TCP segment with the destination port set to `80`, the source port assigned to a random short value and the flags attribute set to `S` (which indicates the type SYN). The packet is assembled by combining the IP and TCP layers.
-
-<!---
-### Attack on DNS
-
-The script sets up a netfilter queue by adding a ruleset using nftables, binds the queue number to the `process_packet()` callback, and starts the queue. If the script is interrupted with a keyboard interrupt, it flushes the rulesets and exits.
-
-The `process_packet()` is a callback function that is executed whenever a new packet is redirected to the netfilter queue. It first converts the netfilter queue packet to a Scapy packet. If the Scapy packet has a DNS Resource Record (DNS reply) layer, the function prints the packet summary before modification and attempts to modify the packet using the `modify_packet()` function. After modification, the packet summary is printed again, and the modified Scapy packet is set back as a netfilter queue packet. Finally, the packet is accepted.
-
-The `modify_packet()` function takes a `packet` argument containing a DNS Resource Record. It extracts the domain name and checks if it exists in the `dns_hosts` dictionary. If the domain name is not in the dictionary, the function prints "no modification" and returns the original packet. If the domain name is in the dictionary, the function crafts a new DNS answer with the spoofed IP address specified in the `dns_hosts` dictionary. It updates the DNS answer count to 1 and removes the checksums and length fields of the IP and UDP layers, allowing Scapy to recalculate them automatically. The modified packet is then returned.
--->
 
 ### Validation of the attack
 
@@ -599,46 +587,6 @@ After 1 minute, `ws2` is able to ping `ws3` again (the MAC address of `ws2` will
 
 ![ARP_cache_poisoning](/img/validation_arp/validation_arp_after_rate_limit.png)
 
-
-
-[comment]: <> (###########################################)
-
-<!---
-### Validation of the attack (DNS)
-
-From `ws3`, open a `xterm` terminal, then type, for example, `dig @10.12.0.20 example.com -p 5353`
-
-```
-; <<>> DiG 9.16.1-Ubuntu <<>> @10.12.0.20 example.com -p 5353
-; (1 server found)
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 53412
-;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 4096
-;; QUESTION SECTION:
-;example.com.			IN	A
-
-;; ANSWER SECTION:
-example.com.		0	IN	A	10.12.0.10
-
-;; Query time: 23 msec
-;; SERVER: 10.12.0.20#5353(10.12.0.20)
-;; WHEN: Tue May 02 15:07:30 PDT 2023
-;; MSG SIZE  rcvd: 67
-```
-
-Here we can directly see that the response from the DNS has been modified and therefore the address of `example.com` is no longer `192.192.192.192`. We choose in the script the address `10.12.0.10`, we can chose any address we want. 
-
-
-### Protection on DNS
-
-### Validation of the protection
-
-
--->
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
