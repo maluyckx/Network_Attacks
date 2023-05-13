@@ -22,9 +22,19 @@ port_range = (1, 65535)
 num_threads = 100
 ntp_port = 123
 
-NTP_PACKET = struct.pack("!12I", *(2 << 3, ) + (0,) * 11)
-
-
+def scan_ntp(host):
+    """
+    Function to scan the NTP port
+    """
+    global ntp_port
+    ntp_packet = IP(dst=host)/UDP(dport=ntp_port)/Raw(load='\x1b' + 47 * '\0')
+    ans = sr(ntp_packet,timeout=2)[0]
+    # check if response is a NTP response packet
+    if ans and ans[0][1].haslayer(UDP) and ans[0][1].haslayer(NTP) and ans[0][1][NTP].version == 4:
+        print(f"Host : {host}, Port : {ntp_port} is open")
+    else: 
+        print("No response on NTP port") # todo remove
+        
 def scan_host(host, port_queue):
     """
     Function to scan ports on a single host
@@ -33,32 +43,20 @@ def scan_host(host, port_queue):
         port = port_queue.get()
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
+            sock.settimeout(0.25)
             result = sock.connect_ex((host, port))
 
             if result == 0:
                 print(f"Host : {host}, Port : {port} is open")
 
-            # Check the NTP port and send an NTP request and checks if there is a response
-            # elif port == ntp_port: # TODO : revoir cette partie /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\
-            #     ntp_packet = IP(dst=host)/UDP(dport=123)/Raw(load='\x1b' + 47 * '\0')
-            #     ans, unans = sr(ntp_packet,timeout=2) # or add the parameter loop=1
-            #     # Check if there is a response
-            #     print("ans : ", ans)
-            #     print("unans : ", unans)
-            #     if ans:
-            #         print("There is a response!")
-            #     else:
-            #         print("No response.")
-
             sock.close()
         except Exception as e:
             print(f"Error scanning host {host}, port {port} : {e}")
 
-
 def main():
     for host in target_hosts:
         print(f"Scanning host: {host}")
+        scan_ntp(host)
         start_time = time.time()
         port_queue = Queue()
         for port in range(*port_range):
@@ -73,6 +71,7 @@ def main():
         # Wait for all the threads to complete before moving on to the next host
         for t in threads:
             t.join()
+            
         print(f"Time taken : {time.time() - start_time}")
 
 

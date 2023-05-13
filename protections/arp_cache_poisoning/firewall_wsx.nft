@@ -9,7 +9,7 @@ table arp filter {
         # Limit ARP requests per MAC address
         arp operation request meter per-mac { ether saddr limit rate 1/minute burst 1 packets } counter accept
 
-        # Drop other ARP requests and log them
+        # Drop other ARP requests
         arp operation request counter drop
         }
 }

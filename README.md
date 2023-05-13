@@ -18,7 +18,6 @@ Assuming the `mininet-vm` is already launched, the following files need to be co
 
 Once the files are copied, you need to use the command `pip3 install -r requirements.txt` to install the required dependencies.
 
-TODO maybe modifier /etc/hosts ?
 
 TODO network scan NTP chelou
 
@@ -29,7 +28,7 @@ TODO fix les derniers todo des codes
 
 You can launch the topology with the following command (after copying our files in the VM) :
 
-To launch the mininet topology, execute this command in the VM : `sudo -E python3 ~/LINFO2347/topo.py`
+`sudo -E python3 ~/LINFO2347/topo.py`
 
 For all other sections in this report, the default state will be inside the mininet environnement. 
 
@@ -42,7 +41,7 @@ To make the topology more secure, we need to make changes :
  
 To implement these changes, we set up several nft tables that you can find in the folder `protections/basic_network/`.
 
-The first one is one the router r1.
+The first one is on the router r1.
 ```
 #!/usr/sbin/nft -f
 
@@ -70,7 +69,7 @@ table inet filter {
 }
 ```
 
-The second one is one the router r2.
+The second one is on the router r2.
 ```
 #!/usr/sbin/nft -f
 
@@ -89,34 +88,25 @@ table inet filter {
 
         # Allow DMZ servers to only respond to incoming connections (from Internet)
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.2.0.0/24 ct state established,related accept
-
-        # #### Bypass Command #### # to redirect the packets to the other router (R1) because R2 is the default gateway for DMZ servers
+        
+        # Allow to redirect the packets to the other router (R1) because R2 is the default gateway for DMZ servers
         iif "r2-eth12" ip saddr 10.12.0.0/24 ip daddr 10.1.0.0/24 accept
 
         # Allow Internet to only respond to incoming connections towards workstations
         iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.1.0.0/24 ct state established,related accept
 
         # Allow Internet to send ping and initiate a connection towards DMZ servers
-        # 10.12.0.10 accepts port 80
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.10 tcp dport 80 ct state new,established,related accept
-
-        # 10.12.0.20 accepts port 5353
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.20 udp dport 5353 ct state new,established,related accept
-
-        # 10.12.0.30 accepts port 123
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.30 udp dport 123 ct state new,established,related accept
-
-        # 10.12.0.40 accepts port 21
-        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.40 tcp dport 21 ct state new,established,related accept
+        iif "r2-eth0" ip saddr 10.2.0.0/24 ip daddr 10.12.0.0/24 ct state new,established,related accept
     }
 
     chain output {
         type filter hook output priority 0; policy accept;
     }
 }
+
 ```
 
-And the last one need to be deployed on every host of the DMZ (http, dns, ntp and ftp).
+And the last one needs to be deployed on every host of the DMZ (http, dns, ntp and ftp).
 ```
 #!/usr/sbin/nft -f
 
@@ -167,6 +157,9 @@ py http.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 py ftp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 ```
+
+We created similar scripts for the other protections. You can find them in the folder `protections/`.
+
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -176,11 +169,11 @@ py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
 
 All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
 
-General comment regarding our protections against reflected DDoS and syn flood attacks :  we conducted a test both before and after implementing the protection. We measured the time it took to `curl` a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the `curl` command was still longer than usual.
+**General comment regarding our protections against reflected DDoS and SYN flood attacks** :  we conducted a test both before and after implementing the protection. We measured the time it took to `curl` a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the `curl` command was still longer than usual.
 
 Upon further investigation, we found that the cause of the delay was not due to our protection not working as intended, but rather the mininet topology being **overloaded** (dropping packets, etc). We confirmed this by using the `tcpdump` command on the correct interface to observe a reduction in the number of requests passing through.
 
-**Remark** : For all the attacks, we hardcoded some information (IP addresses of the hosts, target, gateway, username, etc) in the script. If you want to test it on a different topology, you will need to change these information in the script. 
+**Remark** : For all the attacks, we hardcoded some information (IP addresses of the hosts, target, gateway, username, etc) in the script. If you want to test it on a different topology, you will need to change these information. 
 
 
 [comment]: <> (###########################################)
@@ -196,10 +189,10 @@ To launch the attack on `DMZ_servers` from `internet` (like a real attacker woul
 3) Run the command `python3 main.py`.
 4) Enjoy.
 
-### Attack
-The attack script uses the socket library to create TCP sockets and attempt to connect to ports within the range of 1-65535. For each port, the script attempts to connect to the IP address and port combination using the `s.connect((t_IP, port))` statement. If a connection is successful, the script prints the port number and the protocol name associated with the port using the `socket.getservbyport(port)` function call.
+### Attack TODO add NTP port
+The attack script uses the socket library to create TCP sockets and attempts to connect to ports within the range of 1-65535. For each port, the script attempts to connect to the IP address and port combination using the `sock.connect_ex((host, port))` statement. If a connection is successful, the script prints the port number and the protocol name associated with the port.
 
-To manage a thread pool of up to 100 worker threads, the script uses the `concurrent.futures.ThreadPoolExecutor` function. This allows multiple port scan requests to be processed concurrently.
+To manage a thread pool of up to 100 worker threads. This allows multiple port scan requests to be processed concurrently.
 
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
 
@@ -214,11 +207,16 @@ Starting scan on host : 192.168.56.101
 Time taken : 2.68119740486145
 ```
 
-### Protection
-To protect against TCP Network scan, we need to keep track of the number of syn packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the host concerned is blacklisted for 1 hour. // TODO
+### Protection TODO SUPP TCP
+To protect against TCP Network scan, we need to keep track of the number of SYN packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
+
+``` TODO ADD THESE RULES INTO THE PROTECTION IF THE SCAN IS UDP
+    # Add the source IP to the blacklist if it exceeds the connection rate limit
+    udp limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
+    udp limit rate 5/second accept
+```
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
-
 ```
     set blacklist {
         type ipv4_addr
@@ -240,7 +238,7 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 }
 ```
 
-To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 ### Validation of the protection
 
@@ -258,7 +256,7 @@ table inet filter {
 }
 ```
 
-And also, the `tcpdump -i r2-eth12 && date` capture of the scanned machine indicates that no further packets were received after the 50 packets and the `date` command confirms that no manipulation occurred. The output of the command is shown below :
+And also, the output of this command : `tcpdump -i r2-eth12 && date` on the machine that was scanned, indicates that no further packets were received after the 50 packets and the `date` command confirms that no manipulation occurred. The output of the command is shown below :
 ```bash
 root@mininet-vm:~# tcpdump -i r2-eth12 && date
 .
@@ -288,17 +286,19 @@ The attack scripts can be found in the `attacks/ftp_brute_force` directory.
 
 Our script performs a threaded brute-force attack against an FTP server using a list of commonly used passwords (stored in `10k-most-common.txt`).
 
-To launch the attack on `FTP` from `internet` (like a real attacker would do), follow these steps :
+To launch the attack on `FTP` (in the `DMZ`) from `internet` (like a real attacker would do), follow these steps :
 
 1) Open a new terminal window using the command `xterm internet`.
 2) Move to the `attacks/ftp_brute_force/` directory.
-3) Run the command `python3 main_ftp.py`.
+3) Run the command `python3 main.py`.
 4) Enjoy.
 
 
 ### Attack
 
-We use the `ftplib` library to connect to the FTP server with the specified host IP address, username, and password. It reads in a wordlist file of commonly used passwords and attempts to log in with each password in the list using a separate thread for each login attempt.
+We use the `ftplib` library to connect to the FTP server with the specified host IP address, username and password. It reads in a wordlist file of commonly used passwords that we found on the internet and attempts to log in with each password in the list using a separate thread for each login attempt.
+
+**Remark** : We manually added the password `mininet` to this list so that the attack could be successful.
 
 The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 16 worker threads, allowing multiple login attempts to be processed concurrently.
 
@@ -324,20 +324,25 @@ Found Password : mininet for account : mininet
 Time taken : 18.703977584838867
 ```
 
-To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 ### Protection on FTP
 
-To protect against `FTP` brute-force attacks, we need to keep track of the number of new, not-yet-established connection packets sent to the destination port `21` then if the rate of these packets exceeds a certain threshold, we drop them. // TODO
+To protect against `FTP` brute-force attacks, we need to keep track of the number of new which means not-yet-established connection packets sent to the destination port `21`. If the rate of these packets exceeds a certain threshold, we drop them.
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
 ```
-...
-tcp dport 21 ct state new counter packets 1 bytes 60 jump block_ftp_bruteforce
-...
-chain block_ftp_bruteforce {
-    ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
-}
+    ...
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+
+        tcp dport 21 ct state new counter packets 1 jump block_ftp_bruteforce
+    ...
+    }
+    ...
+    chain block_ftp_bruteforce {
+        ct state new tcp dport 21 limit rate over 10/minute burst 5 packets counter drop
+    }
 ```
 
 
@@ -361,12 +366,15 @@ Found Password : mininet for account : mininet
 Time taken : 372.4294068813324
 ```
 
+The time taken might be a bit surprising since we limit the traffic to 10 packets per minute. However, do not forget that the attack uses multiple threads so we cannot really predict the time taken. The important thing is that the attack is taking significantly longer now.
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 
 ## Reflected DDoS
-The attack scripts can be found in the `attacks/reflected_ddos` directory. By default, the attack launchs from `internet` to `http`. It benefits from the return values of `dns` and `ntp` sent to `http` (using a spoofed source address) which usually are bigger than the requests. 
+The attack scripts can be found in the `attacks/reflected_ddos` directory. By default, the attack is launched from `internet` to `http`.  
+
+It uses the return values of `dns` and `ntp` servers to perform a reflected DDoS attack against the target IP address. The attacker sends DNS and NTP requests to the DNS and NTP servers, respectively, with the target IP address as the source IP address. The DNS and NTP servers will then send their responses, which usually are bigger than the requests, to the target IP address, causing a reflected DDoS attack.
 
 To launch the DDoS attack from `internet` (like a real attacker would do), follow these steps :
 
@@ -377,15 +385,15 @@ To launch the DDoS attack from `internet` (like a real attacker would do), follo
 
 ### Attack
 
-We use the `scapy` library to craft DNS and NTP packets with the specified target IP address as the source IP, and send them to the DNS and NTP servers, respectively. The script performs a reflected DDoS attack by alternating between DNS and NTP requests which are submitted to separate threads for each attack attempt.
+We use the `scapy` library to craft DNS and NTP packets with the specified target IP address as the source IP. As explained earlier, the script performs a reflected DDoS attack by alternating between DNS and NTP requests which are submitted to separate threads for each attack attempt.
 
-The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 16 worker threads, allowing multiple DDoS attack attempts to be processed concurrently.
+The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of up to 1000 worker threads, allowing multiple DDoS attack attempts to be processed concurrently.
 
-For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address, DNS server or and NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result, and if it does not return a `None` value, the script shuts down the executor, prints the time taken and exits.
+For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address and DNS server or NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result and if it does not return a `None` value, the script shuts down the executor, prints the time taken and exits.
 
 ### Validation of the attack
 
-In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server
+In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server :
 
 <ins>Before Reflected DDoS</ins>
 
@@ -410,7 +418,13 @@ Initially, we attempted to implement `rate limiting` and `packet dropping` rules
 For `r2`, we added the following rules to the `firewall_r2.nft` file. The values we used for the rate limiter are not typical real-world values, but they were chosen to validate the effectiveness of our protection and easily demonstrate it to you.
 The first rule is added to the chain `forward` :
 ```
-    iif "r2-eth0" ip protocol udp ip daddr { 10.12.0.20, 10.12.0.30 } jump protect_services
+    ...
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+
+        iif "r2-eth0" ip protocol udp ip daddr { 10.12.0.20, 10.12.0.30 } jump protect_services
+    ...
+    }
     ...
     chain protect_services {
         udp dport 5353 limit rate 3/second burst 5 packets accept
@@ -420,9 +434,13 @@ The first rule is added to the chain `forward` :
 ```
 
 For `DMZ-servers`, we added the following rules to the `firewall_DMZ.nft` file.
-The first rule is added to the chain `output` :
+The first rule is added to the chain `input` :
 ```
-    ip daddr {10.2.0.0/24, 10.1.0.0/24, 10.12.0.1, 10.12.0.2} ct state established,related accept
+    chain input {
+        type filter hook input priority 0; policy accept;
+
+        ip protocol udp ip daddr {10.12.0.20, 10.12.0.30} ip saddr {10.2.0.0/24} jump protect_services
+    }
     ...
     chain protect_services {
         ip saddr != { 10.2.0.0/24 } drop
@@ -430,7 +448,7 @@ The first rule is added to the chain `output` :
 }
 ```
 
-To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 ### Validation of the protection
 
@@ -466,24 +484,26 @@ We can see that it validates our protection since, every seconds, only 3 packets
 
 ## BONUS : ARP cache poisoning
 
-The attack script for ARP <!---and DNS--> can <!---both--> be found in the `attacks/arp_cache_poisoning` folder. The first script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer. <!--- The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.-->
+The attack script for ARP <!---and DNS--> can <!---both--> be found in the `attacks/arp_cache_poisoning` folder. The <!---first--> script performs an ARP cache poisoning attack by sending forged ARP packets (with the ip of the router for example) to the target, therefore, the packets will be redirected to the attacker's computer instead of the router. <!--- The second script intercepts DNS responses and modifies them to redirect specified domain names to a fake IP address. However, since this type of attack requires to be between the victim and the DNS server, it will be required to launch the ARP poisoning first.-->
 
 To launch the `ARP` attack from `ws2` (to target `ws3`), follow these steps :
 
 1) Open a new terminal window using the command `xterm ws2`.
 2) Move to the `attacks/arp_cache_poisoning/` directory.
-3) Run the command `python3 main_arp.py`. <!---For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background) -->
+3) Run the command `python3 main.py`. <!---For the DNS cache poisoning, we also need to run `python3 main_dns.py` (on another `xterm` terminal or in background) -->
 4) Once the victim (`ws3`) attempts to make a request, the request will first go through `ws2` before reaching its final destination.
-5) ENjoy
+5) Enjoy.
    
 <!--- For the DNS cache poisoning, the script will replace the domain names by fake IP addresses before sending them back to the victim -->
 
 [comment]: <> (###########################################)
 
 ### Attack on ARP
-The `getmac()` function takes a `targetip` argument and creates an ARP request packet using the `Ether()` and `ARP()` functions with the destination MAC address set to the broadcast address (`ff:ff:ff:ff:ff:ff`) and the target IP address set to the `targetip` value. The `srp()` function is used to send the ARP request and wait for a response. If a response is received, the function returns the MAC address of the target IP address.
+The `get_mac()` function takes a `target_ip` argument and creates an ARP request packet using the `Ether()` and `ARP()` functions with the destination MAC address set to the broadcast address (`ff:ff:ff:ff:ff:ff`). The `srp()` function is used to send the ARP request and wait for a response. If a response is received, the function returns the MAC address of the target IP address.
 
-The `spoofarpcache()` function takes `targetip`, `targetmac` and `sourceip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `targetip` value, the source IP address set to the `sourceip` value, and the destination MAC address set to the `targetmac` value.
+The `spoof_arp_cache()` function takes `target_ip`, `target_mac` and `source_ip` arguments and creates a spoofed ARP response packet using the `ARP()` function with the operation code set to 2 (ARP reply), the target IP address set to the `target_ip` value, the source IP address set to the `source_ip` value and the destination MAC address set to the `target_mac` value.
+
+The `craft_packet_target_ip()` function takes `host_ip` and `target_ip` parameters and constructs a packet with a spoofed source IP address to transmit to the intended machine. The IP function is used to set the destination IP address to `host_ip` and the source IP address to `target_ip`. The TCP function is used to create a TCP segment with the destination port set to `80`, the source port assigned to a random short value and the flags attribute set to `S` (which indicates the type SYN). The packet is assembled by combining the IP and TCP layers.
 
 <!---
 ### Attack on DNS
@@ -495,15 +515,13 @@ The `process_packet()` is a callback function that is executed whenever a new pa
 The `modify_packet()` function takes a `packet` argument containing a DNS Resource Record. It extracts the domain name and checks if it exists in the `dns_hosts` dictionary. If the domain name is not in the dictionary, the function prints "no modification" and returns the original packet. If the domain name is in the dictionary, the function crafts a new DNS answer with the spoofed IP address specified in the `dns_hosts` dictionary. It updates the DNS answer count to 1 and removes the checksums and length fields of the IP and UDP layers, allowing Scapy to recalculate them automatically. The modified packet is then returned.
 -->
 
-### Validation of the attack (ARP)
+### Validation of the attack
 
-For the validation, we launch the script then after, we can see the packets going through `ws2` using the command `tcpdump`. 
+For the validation, we will monitor the packets going through `ws2` using the command `tcpdump`. 
 
-Note that when running `tcpdump`, it will show a lot of `ARP` packets. These are the packets forged for cache poisoning. Therefore, we stopped the attack script after several seconds to easily find the packets going from `ws3` to the gateway through `ws2`.
-
+Note that when running `tcpdump`, it will show a lot of `ARP` packets which are the packets forged for cache poisoning. To easily find the packets that are sent from `ws3` to the gateway via `ws2`, we stopped the attack script after a few seconds to prevent further packet transmission, allowing for a thorough analysis.
 
 Result on the `ws3` when performing a ping to `http` :
-
 ```
 root@mininet-vm:~# ping 10.12.0.10
 PING 10.12.0.10 (10.12.0.10) 56(84) bytes of data.
@@ -512,7 +530,6 @@ From 10.1.0.2: icmp_seq=1 Redirect Host(New nexthop: 10.1.0.1)
 ```
 
 Result on the `ws2` when using `tcpdump` :
-
 ```
 root@mininet-vm:~# tcpdump
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
@@ -524,40 +541,38 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
-To be honest, implementing a good protection for this attack was really though. We considered several solutions including : 
-- Static table : This would be an ideal solution since we are in a private network where MAC and IP addresses are typically static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
+To be honest, implementing a good protection for this attack was really tough. We considered several solutions including : 
+- Static table : This would be an ideal solution if we were in a private network where MAC and IP addresses were designed to be static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
 - Rate-limiting and timeouts : While this solution would not **completely prevent** an attack, it would provide an early warning that the host is under attack and allow us for a response.
+
+Our protection limits the rate of incoming ARP request for each source MAC address. It is done by using a meter `per-mac` that tracks the rate of incoming ARP requests per MAC address. The rate is limited to 1 ARP request per minute with a burst of 1. If the rate is exceeded, the packet is dropped.
 
 A key point that allowed us to implement our solution is that the attacker's script needs to get the MAC address of the target using the function `get_mac`. When doing this, it burns his only attempt to get the MAC address. However, we are aware that this solution does not prevent completely the attack because an attacker who knows our protection table could :
 - Use the `get_mac` function
-- wait for 1 minute
+- Wait for 1 minute
 - Proceed with ARP cache poisoning
 
 And he would successfully bypass the protection that we made.
 
 Despite the limitations, this is the best solution that we could think of and that offers a reasonable level of protection.
 
-<!--- protect against our particular attack since we need to `get_mac` that particular MAC address before -->
-
-For this attack, we need to create a new file named `firewall_workstation.nft` that is put on ws2. TODO VERIFY
+For this attack, we need to create a new file named `firewall_wsx.nft` that is put on both workstations.
 
 ```
 table arp filter {
     chain input {
         type filter hook input priority filter; policy accept;
+
         # Limit ARP requests per MAC address
         arp operation request meter per-mac { ether saddr limit rate 1/minute burst 1 packets } counter accept
 
-        # Drop other ARP requests and log them
+        # Drop other ARP requests
         arp operation request counter drop
         }
 }
 ```
 
-Remark : 
-
-
-When trying to use the command `pingall` to verify network connectivity, we found something interesting. The ping from `r1` to `ws3` was not working as intended : 
+**Remark** : When trying to use the command `pingall` to verify network connectivity, we found something interesting. The ping from `r1` to `ws3` was not working as intended : 
 
 ```
 r1 -> dns ftp http X ntp r2 ws2 X 
@@ -630,22 +645,22 @@ Here we can directly see that the response from the DNS has been modified and th
 
 
 ## BONUS : SYN Flooding
-The attack scripts can be found in the `attacks/syn_flood_ddos` directory.
+The attack scripts can be found in the `attacks/syn_flood` directory.
 
-We want to flood the target IP with a large number of packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
+We want to flood the target IP with a large number of SYN packets. This type of attack is intended to overwhelm the target's ability to respond to legitimate network requests, causing it to become unavailable or slow to respond.
 
 To launch the attack on `http` from `internet` (like a real attacker would do), follow these steps :
 
 1) Open a new terminal window using the command `xterm internet`.
-2) Move to the `attacks/syn_flood_ddos/` directory.
+2) Move to the `attacks/syn_flood/` directory.
 3) Run the command `python3 main.py`.
 4) Enjoy.
 
 ### Attack
 
-The script creates an IP packet using the `IP()` function with the destination IP address set to the `target_ip` value. The `TCP()` function is then used to create a TCP SYN packet with a random source port and the destination port set to the `target_port\ value. The `flags` parameter is set to "S" to indicate that this is a SYN packet.
+The script creates an IP packet using the `IP()` function with the destination IP address set to the `target_ip` value. The `TCP()` function is then used to create a TCP SYN packet with a random source port and the destination port set to the `target_port` value. The `flags` parameter is set to "S" to indicate that this is a SYN packet.
 
-Finally, the script creates a Raw packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the IP, TCP and Raw packets together using the `/` operator.
+Finally, the script creates a `Raw` packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the `IP`, `TCP` and `Raw` packets together.
 
 ### Validation of the attack
 
@@ -670,29 +685,34 @@ sys     0m0.008s
 
 ### Protection
 
-To implement these changes, we added these rules to the `firewall_r2.nft` file.
+To implement these changes, we added some rules to the `firewall_r2.nft` file.
 
-The first rule filters incoming `TCP` packets with only the `SYN` flag set. The `SYN` flag is set in the initial packet of the `TCP` handshake process which is used to establish a connection between two hosts. The rule counts the number of packets that match these conditions using the `counter` keyword and, if a packet matches, it jumps to the `syn_flood_protection` chain for additional evaluation.
+The first rule filters incoming `TCP` packets with only the `SYN` flag set. The `SYN` flag is set in the initial packet of the `TCP` handshake process which is used to establish a connection between two hosts. The rule counts the number of packets that match these conditions using the `counter` keyword and, if a packet matches, it jumps to the `syn_flood_protection` chain.
 
 A chain block is defined for processing the `SYN` packets that match the rule. The `ct state new` keyword is used to match packets that are part of a new connection. The `limit rate 3/second burst 5 packets` keywords are used to limit the number of packets that are accepted to 3 per second with a burst of 5 packets. This means that up to 5 packets can be processed in a short burst without triggering the rule. However, if the incoming packet rate consistently exceeds 3 packets per second, the rule will be triggered and the specified action will be taken. We estimate that a legitimate number of connections per second is 3 with temporary spikes of 5 connections. The `counter` keyword is used to count the number of packets that are accepted and dropped by the rule. If the number of packets exceeds the limit, the `drop` keyword is used to drop the packet. Otherwise, the `accept` keyword is used to accept the packet.
 
-Remark : When too many threads are launched, the VM is overloaded and the results are not necessarily reliable. In a real situation, the server would be more powerful and would be able to handle more requests.
+**Remark** : When too many threads are launched, the VM is **overloaded** and the results are not necessarily reliable. In a real situation, the server would be more powerful and would be able to handle more requests.
 We can see that the time is not constant and that it is not necessarily longer than before the attack. 
-
 ```
-tcp flags syn tcp flags == syn counter jump syn_flood_protection
-...
-chain syn_flood_protection {
-    ct state new limit rate 3/second burst 5 packets counter accept
-    counter drop
-}
+    ...
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+
+        # SYN flood protection
+        tcp flags syn tcp flags == syn counter jump syn_flood_protection
+    ...
+    }
+    chain syn_flood_protection {
+        ct state new limit rate 3/second burst 5 packets counter accept
+        counter drop
+    }
 ```
 
-To confirm that the network connectivity was functioning as expected, the `pingall\ command was executed. The output matched that of the basic enterprise network protection, indicating that all connections were intact and there were no issues introduced that could affect network functionality.
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 ### Validation of the protection
 
-After all the modifications with the modifications : 
+To validate our protection, we measured the time for getting a response from the `http` server and we compared it with the time before the attack. We can see that it is pretty much the same.
 ```
 real    0m0.089s
 user    0m0.006s
