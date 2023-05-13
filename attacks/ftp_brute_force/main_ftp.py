@@ -3,6 +3,10 @@ Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
 Brute-forcing FTP
+
+This script will try to brute-force the FTP server with a username and a given wordlist. For more information, see the README.md file.
+
+Usage : python3 main.py
 """
 
 import sys

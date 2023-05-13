@@ -3,6 +3,10 @@ Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
 ARP cache poisoning
+
+This script will try to poison the ARP cache of the target machine and the gateway. For more information, see the README.md file.
+
+Usage : python3 main.py
 """
 
 from scapy.all import *

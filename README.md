@@ -20,6 +20,8 @@ Once the files are copied, you need to use the command `pip3 install -r requirem
 
 TODO maybe modifier /etc/hosts ?
 
+TODO network scan NTP chelou
+
 TODO fix les derniers todo des codes
 
 
@@ -177,6 +179,9 @@ All scripts are written in Python. To run them, simply use the command `python3 
 General comment regarding our protections against reflected DDoS and syn flood attacks :  we conducted a test both before and after implementing the protection. We measured the time it took to `curl` a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the `curl` command was still longer than usual.
 
 Upon further investigation, we found that the cause of the delay was not due to our protection not working as intended, but rather the mininet topology being **overloaded** (dropping packets, etc). We confirmed this by using the `tcpdump` command on the correct interface to observe a reduction in the number of requests passing through.
+
+**Remark** : For all the attacks, we hardcoded some information (IP addresses of the hosts, target, gateway, username, etc) in the script. If you want to test it on a different topology, you will need to change these information in the script. 
+
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)

@@ -3,6 +3,10 @@ Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
 Network scans
+
+This script is used to thread a network scan for open ports with a particular focus on the NTP port. For more information, see the README.md file.
+
+Usage : python3 main.py
 """
 
 

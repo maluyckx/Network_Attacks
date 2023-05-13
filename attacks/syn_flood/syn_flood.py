@@ -3,6 +3,10 @@ Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
 SYN Flood utils
+
+This script will perform a SYN flood attack on the target IP address and port.
+
+Usage : should not be used directly, use main.py instead.
 """
 from scapy.all import *
 import concurrent.futures
