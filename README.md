@@ -167,7 +167,9 @@ We created similar scripts for the other protections. You can find them in the f
 
 ## How to launch attacks and protections
 
-All scripts are written in Python. To run them, simply use the command `python3 <script name>.py`.
+All attack scripts are written in Python. To run them, simply use the command `python3 <script name>.py` on the correct host. More information will be provided in the following sections.
+
+To launch the protections, you will need to use the `source protections/<attack name>/commands_<attack name>.py` command in Mininet. More information will be provided in the following sections.
 
 **General comment regarding our protections against reflected DDoS and SYN flood attacks** :  we conducted a test both before and after implementing the protection. We measured the time it took to `curl` a defined host to determine if our protection was working effectively. While we did find that the protection was able to reduce the number of requests passing through, we also observed that the time taken by the `curl` command was still longer than usual.
 
@@ -208,6 +210,9 @@ Time taken : 2.68119740486145
 ```
 
 ### Protection TODO SUPP TCP
+
+To launch the protection, use the following command in mininet : `source protections/network_scans/commands_network_scans.py`.
+
 To protect against TCP Network scan, we need to keep track of the number of SYN packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
 
 ``` TODO ADD THESE RULES INTO THE PROTECTION IF THE SCAN IS UDP
@@ -328,6 +333,8 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 
 ### Protection on FTP
 
+To launch the protection, use the following command in mininet : `source protection/ftp_brute_force/commands_ftp_brute_force.py`.
+
 To protect against `FTP` brute-force attacks, we need to keep track of the number of new which means not-yet-established connection packets sent to the destination port `21`. If the rate of these packets exceeds a certain threshold, we drop them.
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
@@ -412,6 +419,8 @@ sys     0m0.006s
 ```
 
 ### Protection
+
+To launch the protection, use the following command in mininet : `source protection/reflected_ddos/commands_reflected_ddos.py`.
 
 Initially, we attempted to implement `rate limiting` and `packet dropping` rules only on `r2`. But after a while, we thought that it was a better idea to solve this issue, by implementing some `load balancing`. We applied a rate limiter to the `r2`, while implementing packet dropping on the `DMZ-servers`.
 
@@ -529,6 +538,8 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
+To launch the protection, use the following command in mininet : `source protection/arp_cache_poisoning/commands_arp_cache_poisoning.py`.
+
 To be honest, implementing a good protection for this attack was really tough. We considered several solutions including : 
 - Static table : This would be an ideal solution if we were in a private network where MAC and IP addresses were designed to be static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
 - Rate-limiting and timeouts : While this solution would not **completely prevent** an attack, it would provide an early warning that the host is under attack and allow us for a response.
@@ -632,6 +643,8 @@ sys     0m0.008s
 
 
 ### Protection
+
+To launch the protection, use the following command in mininet : `source protection/syn_flood/commands_syn_flood.py`.
 
 To implement these changes, we added some rules to the `firewall_r2.nft` file.
 
