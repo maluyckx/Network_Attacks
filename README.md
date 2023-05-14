@@ -148,7 +148,7 @@ ws3 -> dns ftp http internet ntp r1 r2 ws2
 *** Results: 52% dropped (34/72 received) 
 ```
 
-To save time deploying all of our scripts at once, we created a simple python script. To use it, simply run the command `source protections/commands_basic_protection.py` in Mininet. Here's what the script looks like :
+To save time deploying all of our scripts at once, we created a simple python script. To use it, simply run the command `source protections/basic_network/commands_basic_protection.py` in Mininet. Here's what the script looks like :
 ```bash
 py r1.cmd("sudo nft -f protections/basic_network_protection/firewall_r1.nft")
 py r2.cmd("sudo nft -f protections/basic_network_protection/firewall_r2.nft")
@@ -333,7 +333,7 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 
 ### Protection on FTP
 
-To launch the protection, use the following command in mininet : `source protection/ftp_brute_force/commands_ftp_brute_force.py`.
+To launch the protection, use the following command in mininet : `source protections/ftp_brute_force/commands_ftp_brute_force.py`.
 
 To protect against `FTP` brute-force attacks, we need to keep track of the number of new which means not-yet-established connection packets sent to the destination port `21`. If the rate of these packets exceeds a certain threshold, we drop them.
 
@@ -420,7 +420,7 @@ sys     0m0.006s
 
 ### Protection
 
-To launch the protection, use the following command in mininet : `source protection/reflected_ddos/commands_reflected_ddos.py`.
+To launch the protection, use the following command in mininet : `source protections/reflected_ddos/commands_reflected_ddos.py`.
 
 Initially, we attempted to implement `rate limiting` and `packet dropping` rules only on `r2`. But after a while, we thought that it was a better idea to solve this issue, by implementing some `load balancing`. We applied a rate limiter to the `r2`, while implementing packet dropping on the `DMZ-servers`.
 
@@ -538,7 +538,7 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
-To launch the protection, use the following command in mininet : `source protection/arp_cache_poisoning/commands_arp_cache_poisoning.py`.
+To launch the protection, use the following command in mininet : `source protections/arp_cache_poisoning/commands_arp_cache_poisoning.py`.
 
 To be honest, implementing a good protection for this attack was really tough. We considered several solutions including : 
 - Static table : This would be an ideal solution if we were in a private network where MAC and IP addresses were designed to be static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
@@ -644,7 +644,7 @@ sys     0m0.008s
 
 ### Protection
 
-To launch the protection, use the following command in mininet : `source protection/syn_flood/commands_syn_flood.py`.
+To launch the protection, use the following command in mininet : `source protections/syn_flood/commands_syn_flood.py`.
 
 To implement these changes, we added some rules to the `firewall_r2.nft` file.
 
