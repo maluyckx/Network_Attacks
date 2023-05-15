@@ -198,28 +198,52 @@ To manage a thread pool of up to 100 worker threads. This allows multiple port s
 
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
 
-
-### Validation of the attack TODO REFAIRE 
+For the NTP server, we implemented a separate function that send a NTP request to the port 123. However, as discussed with François De Keersmaeker, the NTP port of the IP address `10.12.0.30` was unresponsive to our NTP request. Even when using the nmap tool (`nmap -sU -vv 10.12.0.30 -p123`) to verify that we did not make a mistake in our code, we were not able to get a response from the NTP server. Here is the output of the nmap command : 
 ```
-Starting scan on host : 192.168.56.101
-21 is open. Possibly : ftp
-22 is open. Possibly : ssh
-80 is open. Possibly : http
-5353 is open. Possibly : mdns
-Time taken : 2.68119740486145
+root@mininet-vm:~# nmap -sU -vv 10.12.0.30 -p123
+Starting Nmap 7.80 ( https://nmap.org ) at 2023-05-15 04:40 PDT
+Initiating Ping Scan at 04:40
+Scanning 10.12.0.30 [4 ports]
+Completed Ping Scan at 04:40, 0.03s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 04:40
+Completed Parallel DNS resolution of 1 host. at 04:40, 13.02s elapsed
+Initiating UDP Scan at 04:40
+Scanning 10.12.0.30 [1 port]
+Completed UDP Scan at 04:40, 0.04s elapsed (1 total ports)
+Nmap scan report for 10.12.0.30
+Host is up, received echo-reply ttl 63 (0.00055s latency).
+Scanned at 2023-05-15 04:40:13 PDT for 13s
+
+PORT    STATE  SERVICE REASON
+123/udp closed ntp     port-unreach ttl 63
 ```
 
-### Protection TODO SUPP TCP
+As a result, we made the decision to remove the function from our running code, although we've kept it in the comments section for your reference.
+
+### Validation of the attack
+
+As explained earlier, the scan displays all the ports that are on the topology except for the NTP port.
+```
+root@mininet-vm:~# python3 attacks/network_scans/main.py 
+Scanning host: 10.12.0.10
+Host : 10.12.0.10, Port : 80 is open
+Time taken : 15.987265825271606
+Scanning host: 10.12.0.20
+Host : 10.12.0.20, Port : 5353 is open
+Time taken : 50.27487921714783
+Scanning host: 10.12.0.30
+Time taken : 53.913424253463745
+Scanning host: 10.12.0.40
+Host : 10.12.0.40, Port : 21 is open
+Time taken : 53.92000341415405
+```
+
+### Protection
 
 To launch the protection, use the following command in mininet : `source protections/network_scans/commands_network_scans.py`.
 
 To protect against TCP Network scan, we need to keep track of the number of SYN packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
 
-``` TODO ADD THESE RULES INTO THE PROTECTION IF THE SCAN IS UDP
-    # Add the source IP to the blacklist if it exceeds the connection rate limit
-    udp limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
-    udp limit rate 5/second accept
-```
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
 ```
@@ -237,11 +261,20 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 
         # Add the source IP to the blacklist if it exceeds the connection rate limit
         tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
-        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate 5/second accept
     ...
     }
 }
 ```
+If we had to implement a protection on UDP network port scan, this is the solution that we would've added to the `firewall_r2.nft` file.
+```
+    chain forward {
+        ...
+        # Add the source IP to the blacklist if it exceeds the connection rate limit
+        udp limit rate over 5/second burst 1 packets add @blacklist { ip saddr timeout 1h }
+    ...
+    }
+```
+
 
 To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 

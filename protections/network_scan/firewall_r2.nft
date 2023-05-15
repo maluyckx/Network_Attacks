@@ -22,8 +22,10 @@ table inet filter {
 
         # Add the source IP to the blacklist if it exceeds the connection rate limit
         tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
-        tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate 5/second accept
 
+        # Add the source IP to the blacklist if it exceeds the connection rate limit
+        # ip protocol udp limit rate over 5/second burst 1 packets add @blacklist { ip saddr timeout 1h }
+        
         # Allow workstations to send a ping and initiate a connection towards any other hosts
         iif "r2-eth12" ip saddr 10.1.0.0/24 accept
 

