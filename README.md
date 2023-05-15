@@ -191,7 +191,7 @@ To launch the attack on `DMZ_servers` from `internet` (like a real attacker woul
 3) Run the command `python3 main.py`.
 4) Enjoy.
 
-### Attack TODO add NTP port
+### Attack
 The attack script uses the socket library to create TCP sockets and attempts to connect to ports within the range of 1-65535. For each port, the script attempts to connect to the IP address and port combination using the `sock.connect_ex((host, port))` statement. If a connection is successful, the script prints the port number and the protocol name associated with the port.
 
 To manage a thread pool of up to 100 worker threads. This allows multiple port scan requests to be processed concurrently.
@@ -218,7 +218,40 @@ PORT    STATE  SERVICE REASON
 123/udp closed ntp     port-unreach ttl 63
 ```
 
-As a result, we made the decision to remove the function from our running code, although we've kept it in the comments section for your reference.
+After asking help to François De Keersmaeker, he gave us some instructions : 
+```
+sudo apt-get purge openntpd
+sudo apt-get update
+sudo apt-get install ntpd
+```
+
+After that, he told us to remove one line from the `topo.py` but the version that we provided with the project is already up to date.
+
+Here is the output of the `nmap` command after the change : 
+```
+root@mininet-vm:~# nmap -sU -vv 10.12.0.30 -p123
+Starting Nmap 7.80 ( https://nmap.org ) at 2023-05-15 12:01 PDT
+Initiating Ping Scan at 12:01
+Scanning 10.12.0.30 [4 ports]
+Completed Ping Scan at 12:01, 0.05s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 12:01
+Completed Parallel DNS resolution of 1 host. at 12:01, 13.04s elapsed
+Initiating UDP Scan at 12:01
+Scanning 10.12.0.30 [1 port]
+Discovered open port 123/udp on 10.12.0.30
+Completed UDP Scan at 12:01, 0.04s elapsed (1 total ports)
+Nmap scan report for 10.12.0.30
+Host is up, received reset ttl 63 (0.0014s latency).
+Scanned at 2023-05-15 12:01:03 PDT for 13s
+
+PORT    STATE SERVICE REASON
+123/udp open  ntp     udp-response ttl 63
+
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 13.29 seconds
+           Raw packets sent: 5 (228B) | Rcvd: 2 (116B)
+```
+
 
 ### Validation of the attack
 
@@ -227,23 +260,23 @@ As explained earlier, the scan displays all the ports that are on the topology e
 root@mininet-vm:~# python3 attacks/network_scans/main.py 
 Scanning host: 10.12.0.10
 Host : 10.12.0.10, Port : 80 is open
-Time taken : 15.987265825271606
+Time taken : 17.055407524108887
 Scanning host: 10.12.0.20
 Host : 10.12.0.20, Port : 5353 is open
-Time taken : 50.27487921714783
+Time taken : 48.71262764930725
 Scanning host: 10.12.0.30
-Time taken : 53.913424253463745
+Host : 10.12.0.30, Port : 123 is open
+Time taken : 52.727622270584106
 Scanning host: 10.12.0.40
 Host : 10.12.0.40, Port : 21 is open
-Time taken : 53.92000341415405
+Time taken : 55.34472131729126
 ```
 
 ### Protection
 
 To launch the protection, use the following command in mininet : `source protections/network_scans/commands_network_scans.py`.
 
-To protect against TCP Network scan, we need to keep track of the number of SYN packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
-
+To protect against Network scan, we need to keep track of the number of SYN/UDP packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
 ```
@@ -261,20 +294,10 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
 
         # Add the source IP to the blacklist if it exceeds the connection rate limit
         tcp flags & (fin|syn|rst|psh|ack|urg) == syn limit rate over 5/second burst 10 packets add @blacklist { ip saddr timeout 1h }
-    ...
-    }
-}
-```
-If we had to implement a protection on UDP network port scan, this is the solution that we would've added to the `firewall_r2.nft` file.
-```
-    chain forward {
-        ...
-        # Add the source IP to the blacklist if it exceeds the connection rate limit
-        udp limit rate over 5/second burst 1 packets add @blacklist { ip saddr timeout 1h }
-    ...
-    }
-```
 
+        # Add the source IP to the blacklist if it exceeds the connection rate limit
+        ip protocol udp limit rate over 5/second burst 1 packets add @blacklist { ip saddr timeout 1h }
+```
 
 To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 

