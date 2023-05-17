@@ -453,6 +453,9 @@ The `concurrent.futures.ThreadPoolExecutor` is used to manage a thread pool of u
 
 For each attack attempt, the script submits either a `dns_ddos` or `ntp_ddos` function call with the specified target IP address and DNS server or NTP server (depending on the funtion called) to the thread pool using `executor.submit()`. If any of the attack attempts complete, the program checks the result and if it does not return a `None` value, the script shuts down the executor, prints the time taken and exits.
 
+**Note** : for the DNS DDoS part, we used query type 255 `qtype=255` which is a request for all records that the DNS server has available.
+
+
 ### Validation of the attack
 
 In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server :
