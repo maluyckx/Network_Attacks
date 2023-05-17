@@ -6,7 +6,7 @@ Reflected DDoS
 
 This script performs a reflected DDoS using DNS and NTP servers. For more information, see the README.md file.
 
-Usage : python3 main.py
+Usage : should not be used directly, use main.py instead.
 """
 from scapy.all import *
 import concurrent.futures
