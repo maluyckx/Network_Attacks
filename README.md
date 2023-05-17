@@ -19,11 +19,6 @@ Assuming the `mininet-vm` is already launched, the following files need to be co
 Once the files are copied, you need to use the command `pip3 install -r requirements.txt` to install the required dependencies.
 
 
-TODO network scan NTP chelou
-
-TODO fix les derniers todo des codes
-
-
 ## How to launch the topology
 
 You can launch the topology with the following command (after copying our files in the VM) :

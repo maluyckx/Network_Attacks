@@ -13,6 +13,7 @@ from mininet.examples.linuxrouter import LinuxRouter
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
 import argparse
+import time
 
 
 class TopoSecu(Topo):
@@ -60,8 +61,8 @@ topos = {
 
 def add_routes(net):
     ### STATIC ROUTES ###
-    info(net['r1'].cmd("ip route add 10.2.0.0/24 via 10.12.0.2 dev r1-eth12")) # connect r1 to internet via r2
-    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.12.0.1 dev r2-eth12")) # connect r2 to internet via r1
+    info(net['r1'].cmd("ip route add 10.2.0.0/24 via 10.12.0.2 dev r1-eth12"))
+    info(net['r2'].cmd("ip route add 10.1.0.0/24 via 10.12.0.1 dev r2-eth12"))
 
 
 def start_services(net):
@@ -80,6 +81,8 @@ def stop_services(net):
     info(net['http'].cmd("killall apache2"))
     # dnsmasq DNS server
     info(net['dns'].cmd("killall dnsmasq"))
+    # OpenNTPd NTP server
+    info(net['ntp'].cmd("killall ntpd"))
     # FTP server
     info(net['ftp'].cmd("killall vsftpd"))
 
@@ -90,6 +93,7 @@ def run():
 
     add_routes(net)
     stop_services(net)
+    time.sleep(1)
     start_services(net)
 
     net.start()
