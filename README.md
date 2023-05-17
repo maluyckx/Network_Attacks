@@ -195,7 +195,7 @@ To launch the attack on `DMZ_servers` from `internet` (like a real attacker woul
 ### Attack
 The attack script uses the socket library to create TCP sockets and attempts to connect to ports within the range of 1-65535. For each port, the script attempts to connect to the IP address and port combination using the `sock.connect_ex((host, port))` statement. If a connection is successful, the script prints the port number and the protocol name associated with the port.
 
-To manage a thread pool of up to 100 worker threads. This allows multiple port scan requests to be processed concurrently.
+The script manages a thread pool of up to 100 worker threads. This allows multiple port scan requests to be processed concurrently.
 
 Additionally, the script uses a timeout of 0.25 seconds for each port scan to prevent the script from hanging indefinitely if a port is unresponsive or blocked.
 
@@ -256,7 +256,7 @@ Nmap done: 1 IP address (1 host up) scanned in 13.29 seconds
 
 ### Validation of the attack
 
-As explained earlier, the scan displays all the ports that are on the topology except for the NTP port.
+As explained earlier, the scan displays all the ports that are on the topology :
 ```
 root@mininet-vm:~# python3 attacks/network_port_scan/main.py 
 Scanning host: 10.12.0.10
@@ -339,7 +339,7 @@ root@mininet-vm:~# tcpdump -i r2-eth12 && date
 Thu May 11 08:43:21 PDT 2023
 ```
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said earlier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -432,7 +432,7 @@ Time taken : 372.4294068813324
 
 The time taken might be a bit surprising since we limit the traffic to 10 packets per minute. However, do not forget that the attack uses multiple threads so we cannot really predict the time taken. The important thing is that the attack is taking significantly longer now.
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said earlier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -528,30 +528,31 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 As we said earlier, we are going to use `tcpdump` on the interface `r2-eth12` of `r2` to validate our protection : 
 
 ```
-11:41:55.293670 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? test.com. (26)
-11:41:55.433769 IP 10.12.0.10.62249 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:55.627118 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? domain.oof. (28)
-11:41:55.665084 IP 10.12.0.10.37178 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:55.961650 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? example.be. (28)
-11:41:55.971535 IP 10.12.0.10.3024 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
+16:52:43.254018 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? a-very-long-domain-name.com. (45)
+16:52:43.287000 IP 10.12.0.10.65395 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:43.586841 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? example.com. (29)
+16:52:43.624832 IP 10.12.0.10.63689 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:43.920816 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? a-very-long-domain-name.org. (45)
+16:52:43.947100 IP 10.12.0.10.24865 > 10.12.0.30.ntp: NTPv4, Client, length 48
 
-11:41:56.293736 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? www.example.com. (33)
-11:41:56.429228 IP 10.12.0.10.46145 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:56.628870 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? example.com. (29)
-11:41:56.632363 IP 10.12.0.10.48964 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:56.960321 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? a-very-long-domain-name.com. (45)
+16:52:44.253640 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? example.com. (29)
+16:52:44.280970 IP 10.12.0.10.5525 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:44.588226 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof. (80)
+16:52:44.616842 IP 10.12.0.10.9795 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:44.920672 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof. (80)
+16:52:44.956959 IP 10.12.0.10.54522 > 10.12.0.30.ntp: NTPv4, Client, length 48
 
-11:41:57.083972 IP 10.12.0.10.61670 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:57.293529 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? domain.oof. (28)
-11:41:57.386182 IP 10.12.0.10.8808 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:57.629414 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? a-very-long-domain-name.com. (45)
-11:41:57.687568 IP 10.12.0.10.12357 > 10.12.0.30.ntp: NTPv2, Reserved, length 8
-11:41:57.960520 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ Type225? i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof. (80)
+16:52:45.253916 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? example.org. (29)
+16:52:45.280673 IP 10.12.0.10.37744 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:45.587645 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? a-very-long-domain-name.com. (45)
+16:52:45.622886 IP 10.12.0.10.2865 > 10.12.0.30.ntp: NTPv4, Client, length 48
+16:52:45.920317 IP 10.12.0.10.domain > 10.12.0.20.mdns: 0+ ANY? domain.oof. (28)
+16:52:45.948356 IP 10.12.0.10.37952 > 10.12.0.30.ntp: NTPv4, Client, length 48
 ```
 
 We can see that it validates our protection since, every seconds, only 3 packets of each types (DNS and NTP) are permitted to go through.
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said earlier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -568,7 +569,7 @@ To launch the `ARP` attack from `ws2` (to target `ws3`), follow these steps :
 3) Run the command `python3 main.py`.
 4) Once the victim (`ws3`) attempts to make a request, the request will first go through `ws2` before reaching its final destination.
 5) Enjoy.
-   
+
 [comment]: <> (###########################################)
 
 ### Attack on ARP
@@ -604,7 +605,7 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
-Before enabling the protection, we need to clear the corrupted ARP table of the victim (ws3) and more specifically, the corrupted address of the router. This can be done by using the following command : 
+Before enabling the protection, we need to clear the corrupted ARP table of the victim (`ws3`) and more specifically, the corrupted address of the router. This can be done by using the following command : 
 ```
 arp -d 10.1.0.1
 arp -d 10.1.0.2
@@ -613,8 +614,8 @@ arp -d 10.1.0.2
 To launch the protection, use the following command in mininet : `source protections/arp_cache_poisoning/commands_arp_cache_poisoning.py`.
 
 To be honest, implementing a good protection for this attack was really tough. We considered several solutions including : 
-- Static table : This would be an ideal solution if we were in a private network where MAC and IP addresses were designed to be static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
-- Rate-limiting and timeouts : While this solution would not **completely prevent** an attack, it would provide an early warning that the host is under attack and allow us for a response.
+- **Static table** : This would be an ideal solution if we were in a private network where MAC and IP addresses were designed to be static. However, in practice, it is not feasible because the mininet topology randomizes the MAC addresses of each host.
+- **Rate-limiting and timeouts** : While this solution would not **completely prevent** an attack, it would provide an early warning that the host is under attack and allow us for a response.
 
 Our protection limits the rate of incoming ARP request for each source MAC address. It is done by using a meter `per-mac` that tracks the rate of incoming ARP requests per MAC address. The rate is limited to 1 ARP request per minute with a burst of 1. If the rate is exceeded, the packet is dropped.
 
@@ -667,7 +668,7 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said earlier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 ## BONUS : SYN Flooding
 The attack scripts can be found in the `attacks/syn_flood` directory.
@@ -690,7 +691,7 @@ Finally, the script creates a `Raw` packet with a payload of 1024 bytes, consist
 
 ### Validation of the attack
 
-In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server
+In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server :
 
 <ins>Before SYN Flooding</ins>
 
