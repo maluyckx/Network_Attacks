@@ -55,6 +55,7 @@ if __name__ == '__main__':
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     executor.shutdown(wait=False)
+                    print(f"Time taken : {time.time() - start_time}s")
                     sys.exit(0)
 
     print('Password not found')
