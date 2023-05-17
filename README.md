@@ -383,8 +383,6 @@ Found Password : mininet for account : mininet
 Time taken : 18.703977584838867
 ```
 
-To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
-
 ### Protection on FTP
 
 To launch the protection, use the following command in mininet : `source protections/ftp_brute_force/commands_ftp_brute_force.py`.
@@ -406,6 +404,7 @@ To implement these changes, we added these rules to the `firewall_r2.nft` file.
     }
 ```
 
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 ### Validation of the protection
 As shown earlier, brute-forcing the password required approximately 18 seconds. Now, with the applied modifications : 
