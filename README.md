@@ -178,13 +178,13 @@ Upon further investigation, we found that the cause of the delay was not due to 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 
-## Network scans
-The attack script can be found in the `attacks/network_scans` folder. It performs a parallelized scan of every port from 1 to 65535.
+## Network port scan
+The attack script can be found in the `attacks/network_port_scan` folder. It performs a parallelized scan of every port from 1 to 65535.
 
 To launch the attack on `DMZ_servers` from `internet` (like a real attacker would do), follow these steps :
 
 1) Open a new terminal window using the command `xterm internet`.
-2) Move to the `attacks/network_scans/` directory.
+2) Move to the `attacks/network_port_scan/` directory.
 3) Run the command `python3 main.py`.
 4) Enjoy.
 
@@ -254,7 +254,7 @@ Nmap done: 1 IP address (1 host up) scanned in 13.29 seconds
 
 As explained earlier, the scan displays all the ports that are on the topology except for the NTP port.
 ```
-root@mininet-vm:~# python3 attacks/network_scans/main.py 
+root@mininet-vm:~# python3 attacks/network_port_scan/main.py 
 Scanning host: 10.12.0.10
 Host : 10.12.0.10, Port : 80 is open
 Time taken : 17.055407524108887
@@ -271,9 +271,9 @@ Time taken : 55.34472131729126
 
 ### Protection
 
-To launch the protection, use the following command in mininet : `source protections/network_scans/commands_network_scans.py`.
+To launch the protection, use the following command in mininet : `source protections/network_port_scan/commands_network_port_scan.py`.
 
-To protect against Network scan, we need to keep track of the number of SYN/UDP packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
+To protect against network port scan, we need to keep track of the number of SYN/UDP packets sent by a host that enters to the company netwok then if the rate of these packets exceeds a certain threshold, the concerned host is blacklisted for 1 hour.
 
 To implement these changes, we added these rules to the `firewall_r2.nft` file.
 ```

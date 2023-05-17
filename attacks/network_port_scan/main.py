@@ -2,9 +2,9 @@
 Luyckx Marco 496283
 Bouhnine Ayoub 500048
 
-Network scans
+Network port scan
 
-This script is used to thread a network scan for open ports with a particular focus on the NTP port. For more information, see the README.md file.
+This script is used to thread a network port scan for open ports with a particular focus on the NTP port. For more information, see the README.md file.
 
 Usage : python3 main.py
 """
@@ -13,7 +13,6 @@ Usage : python3 main.py
 import socket
 import threading
 from queue import Queue
-import struct
 import time
 from scapy.all import *
 
@@ -53,7 +52,7 @@ def scan_host(host, port_queue):
 
 def main():
     for host in target_hosts:
-        print(f"Scanning host: {host}")
+        print(f"Scanning host : {host}")
         scan_ntp(host)
         start_time = time.time()
         port_queue = Queue()
