@@ -13,7 +13,7 @@ import time
 import os
 
 
-def run_ddos_syn_flood(command, process_list):
+def run_syn_flood(command, process_list):
     """
     Function to run a command with Popen and store the process in a list
     """
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     process_list = []
 
     command = ['python3', 'syn_flood.py']
-    run_ddos_syn_flood(command, process_list)
+    run_syn_flood(command, process_list)
 
     print("[INFO] Press CTRL+C to kill the running processes ...")
 

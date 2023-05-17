@@ -708,7 +708,7 @@ user    0m0.000s
 sys     0m0.008s
 ```
 
-**Note** : the delay that the attack will produce is proportionate to the resources that you gave to the VM in Virtual Box. If you want the attack to be more effective, you can increase the number of `number_of_processes` in the `run_ddos_syn_flood` of the `attacks/syn_flood/main.py` file.
+**Note** : the delay that the attack will produce is proportionate to the resources that you gave to the VM in Virtual Box. If you want the attack to be more effective, you can increase the number of `number_of_processes` in the `run_syn_flood` of the `attacks/syn_flood/main.py` file.
 
 ### Protection
 
