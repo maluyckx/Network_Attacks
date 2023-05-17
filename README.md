@@ -600,6 +600,12 @@ listening on ws2-eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 ### Protection on ARP
 
+Before enabling the protection, we need to clear the corrupted ARP table of the victim (ws3) and more specifically, the corrupted address of the router. This can be done by using the following command : 
+```
+arp -d 10.1.0.1
+arp -d 10.1.0.2
+```
+
 To launch the protection, use the following command in mininet : `source protections/arp_cache_poisoning/commands_arp_cache_poisoning.py`.
 
 To be honest, implementing a good protection for this attack was really tough. We considered several solutions including : 
@@ -633,22 +639,12 @@ table arp filter {
 }
 ```
 
-**Remark** : When trying to use the command `pingall` to verify network connectivity, we found something interesting. The ping from `r1` to `ws3` was not working as intended : 
-
-```
-r1 -> dns ftp http X ntp r2 ws2 X 
-```
-
-The reason is that the router `r1` (which at first do not know what is the IP address of `ws3`) does **multiple** ARP requests, which results in `r1` being blacklisted.
-
-To ensure a successful ping, it is necessary to wait for **one minute** before attempting the ping.
-
 
 ### Validation of the protection
 
 In our scenario, `ws2` attacks `ws3`.
 
-After executing the attack, we can see that the ARP table of `ws3` has been modified and only the MAC address of `r1` has been added. Therefore, whenever the attacker tries to send ARP packets, it will be blocked for 1 minute.
+After executing the attack, we can see that the ARP table of `ws3` is still empty. Therefore, whenever the attacker tries to send ARP packets, it will be blocked for 1 minute.
 
 ![ARP_cache_poisoning](/img/validation_arp/validation_arp_attack.png)
 
@@ -659,6 +655,9 @@ When trying to ping `ws3` from `ws2` before the 1 minute timeout, we can see tha
 After 1 minute, `ws2` is able to ping `ws3` again (the MAC address of `ws2` will be added to the arp table of `ws3`).
 
 ![ARP_cache_poisoning](/img/validation_arp/validation_arp_after_rate_limit.png)
+
+
+To confirm that the network connectivity was functioning as expected, the `pingall` command was executed **after one minute**. The output matched the basic enterprise network protection, indicating that the network connectivity was not affected by the protection.
 
 
 [comment]: <> (###########################################)
