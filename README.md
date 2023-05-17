@@ -145,12 +145,12 @@ ws3 -> dns ftp http internet ntp r1 r2 ws2
 
 To save time deploying all of our scripts at once, we created a simple python script. To use it, simply run the command `source protections/basic_network/commands_basic_protection.py` in Mininet. Here's what the script looks like :
 ```bash
-py r1.cmd("sudo nft -f protections/basic_network_protection/firewall_r1.nft")
-py r2.cmd("sudo nft -f protections/basic_network_protection/firewall_r2.nft")
-py dns.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
-py http.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
-py ftp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
-py ntp.cmd("sudo nft -f protections/basic_network_protection/firewall_DMZ.nft")
+py r1.cmd("sudo nft -f protections/basic_network/firewall_r1.nft")
+py r2.cmd("sudo nft -f protections/basic_network/firewall_r2.nft")
+py dns.cmd("sudo nft -f protections/basic_network/firewall_DMZ.nft")
+py http.cmd("sudo nft -f protections/basic_network/firewall_DMZ.nft")
+py ftp.cmd("sudo nft -f protections/basic_network/firewall_DMZ.nft")
+py ntp.cmd("sudo nft -f protections/basic_network/firewall_DMZ.nft")
 ```
 
 We created similar scripts for the other protections. You can find them in the folder `protections/`.
