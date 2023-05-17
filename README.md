@@ -314,7 +314,7 @@ table inet filter {
 }
 ```
 
-And also, the output of this command : `tcpdump -i r2-eth12 && date` on the machine that was scanned, indicates that no further packets were received after the 50 packets and the `date` command confirms that no manipulation occurred. The output of the command is shown below :
+And also, after opening the terminal of `r2` using `xterm r2`, the output of the following command `tcpdump -i r2-eth12 && date` indicates that no further packets were received after the 50 packets and the `date` command confirms that no manipulation occurred. The output of the command is shown below :
 ```bash
 root@mininet-vm:~# tcpdump -i r2-eth12 && date
 .
