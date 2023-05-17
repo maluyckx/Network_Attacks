@@ -4,7 +4,7 @@ Bouhnine Ayoub 500048
 
 Reflected DDoS
 
-This script will run the reflected_ddos.py script 12 times in parallel. For more information, see the README.md file.
+This script will run the reflected_ddos.py script 50 times in parallel. For more information, see the README.md file.
 
 Usage : python3 main.py
 """
