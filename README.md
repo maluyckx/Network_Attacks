@@ -476,6 +476,8 @@ user    0m0.000s
 sys     0m0.006s
 ```
 
+**Note** : the delay that the attack will produce is proportionate to the resources that you gave to the VM in Virtual Box. If you want the attack to be more effective, you can increase the number of `number_of_processes` in the `run_reflected_ddos` of the `attacks/reflected_ddos/main.py` file.
+
 ### Protection
 
 To launch the protection, use the following command in mininet : `source protections/reflected_ddos/commands_reflected_ddos.py`.
@@ -682,6 +684,7 @@ The script creates an IP packet using the `IP()` function with the destination I
 
 Finally, the script creates a `Raw` packet with a payload of 1024 bytes, consisting of the letter "A" repeated 1024 times. The `packet` variable is then created by concatenating the `IP`, `TCP` and `Raw` packets together.
 
+
 ### Validation of the attack
 
 In a separate host (`ws2` for example), we measured the time for getting a response from the `http` server
@@ -702,6 +705,7 @@ user    0m0.000s
 sys     0m0.008s
 ```
 
+**Note** : the delay that the attack will produce is proportionate to the resources that you gave to the VM in Virtual Box. If you want the attack to be more effective, you can increase the number of `number_of_processes` in the `run_ddos_syn_flood` of the `attacks/syn_flood/main.py` file.
 
 ### Protection
 

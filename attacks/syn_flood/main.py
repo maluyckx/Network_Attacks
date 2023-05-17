@@ -25,7 +25,7 @@ def run_ddos_syn_flood(command, process_list):
         process_list.append(process)
 
 
-if __name__ == "__main__ ":
+if __name__ == "__main__":
     # List to store the Popen processes
     process_list = []
 

