@@ -1,5 +1,9 @@
 # Network Attacks
 
+## Authors (ULB matricule)
+- LUYCKX Marco 496283
+- BOUHNINE Ayoub 500048
+
 ## Mininet topology
 
 ![Topology](/img/topo.png)
@@ -335,7 +339,7 @@ root@mininet-vm:~# tcpdump -i r2-eth12 && date
 Thu May 11 08:43:21 PDT 2023
 ```
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entiere topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -428,7 +432,7 @@ Time taken : 372.4294068813324
 
 The time taken might be a bit surprising since we limit the traffic to 10 packets per minute. However, do not forget that the attack uses multiple threads so we cannot really predict the time taken. The important thing is that the attack is taking significantly longer now.
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entiere topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -547,7 +551,7 @@ As we said earlier, we are going to use `tcpdump` on the interface `r2-eth12` of
 
 We can see that it validates our protection since, every seconds, only 3 packets of each types (DNS and NTP) are permitted to go through.
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entiere topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
@@ -663,7 +667,7 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
 
-**Remark** : As we said ealier, after this protection, you will need to restart the entiere topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
+**Remark** : As we said ealier, after this protection, you will need to restart the entire topology. To do so, exit the topology with the command `exit`, then use the command `sudo mn -c` to clear the mininet cache and finally relaunch the topology with the command `sudo -E python3 ~/LINFO2347/topo.py`. You are now ready to test the future attacks and protections !
 
 ## BONUS : SYN Flooding
 The attack scripts can be found in the `attacks/syn_flood` directory.
@@ -746,8 +750,3 @@ sys     0m0.007s
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
-
-
-## Authors (ULB matricule)
-- LUYCKX Marco 496283
-- BOUHNINE Ayoub 500048
