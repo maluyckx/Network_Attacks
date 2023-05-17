@@ -27,7 +27,7 @@ You can launch the topology with the following command (after copying our files 
 
 For all other sections in this report, the default state will be inside the mininet environnement. 
 
-**Remark** : After each protection (we made the assumption that you did the attack first without it), you will need to restart the entiere topology. To do so, exit the topology with the command `exit` and then use the command `sudo mn -c` to clear the mininet cache and then relaunch the topology with the command above. We will repeat these steps after each protection so you do not need to remember them.
+**Remark** : After each protection (we made the assumption that you did the attack first without it), you will need to restart the entire topology. To do so, exit the topology with the command `exit` and then use the command `sudo mn -c` to clear the mininet cache and then relaunch the topology with the command above. We will repeat these steps after each protection so you do not need to remember them.
 
 ## Firewall rules for basic enterprise network protection
 
