@@ -739,10 +739,10 @@ To confirm that the network connectivity was functioning as expected, the `pinga
 
 To validate our protection, we measured the time for getting a response from the `http` server and we compared it with the time before the attack. We can see that it is pretty much the same.
 ```
-real    0m0.089s
-user    0m0.006s
-sys     0m0.000s
-```
+real    0m0.023s
+user    0m0.000s
+sys     0m0.007s
+``` 
 
 [comment]: <> (###########################################)
 [comment]: <> (###########################################)
