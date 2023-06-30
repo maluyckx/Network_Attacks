@@ -1,5 +1,7 @@
 # Network Attacks
 
+## Grade : 19/20
+
 ## Authors (ULB matricule)
 - LUYCKX Marco 496283
 - BOUHNINE Ayoub 500048
